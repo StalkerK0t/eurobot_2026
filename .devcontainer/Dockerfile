@@ -86,6 +86,8 @@ RUN sudo apt update \
     && sudo apt-get install -y libgstreamer-plugins-bad1.0-dev
 
 RUN pip install opencv-python --no-cache-dir --break-system-packages
+RUN pip install numpy==1.26.4 --no-cache-dir --break-system-packages
+
 
 FROM base AS dev
 
