@@ -4,10 +4,15 @@
   "runArgs": [
     "--privileged",
     "--network=host",
+    "--ipc=host",
 
-    "--ipc=host"
+    "--env=DISPLAY",
+     "--env=QT_X11_NO_MITSHM=1",
+     "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw",
+     "--device=/dev/dri:/dev/dri"
+ 
+
     // "--gpus=all",
-    // "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw" 
     // "-e NVIDIA_DRIVER_CAPABILITIES=all"
   ],
 

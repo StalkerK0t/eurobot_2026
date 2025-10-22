@@ -1,3 +1,7 @@
+###
+### Before start Node in Real:
+### export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libunwind.so.8
+###
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -8,6 +12,7 @@ import math
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSHistoryPolicy, QoSReliabilityPolicy
 
 
 def quaternion_from_euler(ai, aj, ak):
@@ -33,30 +38,35 @@ def quaternion_from_euler(ai, aj, ak):
 
     return q
 
-class ImageSubscriber(Node):
+class CusCamera(Node):
     def __init__(self):
-        super().__init__('image_subscriber')
-
-        # print(self.get_parameter('use_sim_time').get_parameter_value().bool_value)
+        super().__init__('cus_camera')
+        self.get_logger().info(f"OpenCV version: {cv2.__version__}")
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',rclpy.Parameter.Type.BOOL, True)])
-        # print(self.get_parameter('use_sim_time').get_parameter_value().bool_value)
-
         self.odom_pub = self.create_publisher(Odometry, 'odom', 1000)
+
+        qos_profile = QoSProfile(
+            depth=2,
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            history=QoSHistoryPolicy.KEEP_LAST
+        )
+        # self.timer = self.create_timer(0.1, self.timer_callback)
         self.subscription = self.create_subscription(
             Image,
             '/camera/image', 
-            self.image_callback,
-            10)
+            self.callback,
+            qos_profile=qos_profile)
         self.tf_broadcaster = TransformBroadcaster(self)
 
         self.bridge = CvBridge()
         
-
-        self.get_logger().info(f"OpenCV version: {cv2.__version__}")
-        self.get_logger().info('Image subscriber started')
-
-        self.camera_matrix = np.array([[761.80910110473633, 0., 960], [0., 761.80913686752319, 540], [0., 0., 1.]], dtype=np.float32)
-        self.dist_coeffs = np.array([0, 0, 0, 0, 0], dtype=np.float32)
+        # REAL CAMERA INTRINSIC PARAMS
+        self.K = np.array([[ 1.05477276e+03, -1.10039944e-01,  1.07993991e+03],
+                        [ 0.00000000e+00,  1.05437012e+03,  7.33474904e+02],
+                        [ 0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
+        self.D = np.array([[-0.03337077], [-0.00093301], [-0.00130544], [ 0.0011649 ]])
+        
 
         dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
         parameters = cv2.aruco.DetectorParameters()
@@ -75,34 +85,53 @@ class ImageSubscriber(Node):
         # print(objPoints, ids)
         dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         self.board = cv2.aruco.Board(objPoints, dictionary, ids)
-        
+
+        self.marker_length = 80
+        self.object_corners = np.array([
+            [[-self.marker_length//2,  self.marker_length//2, 0]],  # Левый верхний
+            [[ self.marker_length//2,  self.marker_length//2, 0]],  # Правый верхний
+            [[ self.marker_length//2, -self.marker_length//2, 0]],  # Правый нижний
+            [[-self.marker_length//2, -self.marker_length//2, 0]]   # Левый нижний
+        ], dtype=np.float32)
+
+        self.camera_matrix = None
         self.is_calibrated = False
+        self.last_time = 0
+        self.current_time = 0
+        self.last_time_w = 0
+        self.get_logger().info('Node started')
 
-    def transform(self, center_cord, corner_coord, z=0):
-        alpha = (-z + self.r[-1,:] @ self.t)/(self.r[-1,:] @ center_cord)
+        # self.robot_marker = 1 # синий
+        # self.robot_marker = 7 # желтый
+        self.robot_marker = 69
+
+
+    def transform(self, coordinates, z=0):
         # self.get_logger().info(f"Alpha: \n{alpha}")
+        center = np.mean(coordinates, axis=0).astype(int)
+        center = np.array([center[0], center[1], 1])
+        
+        alpha = (-z + self.r[-1,:] @ self.t)/(self.r[-1,:] @ center)
 
-        pose = self.r @ (alpha * center_cord - self.t)
+        pose = self.r @ (alpha * center - self.t)
         pose[1] = 2000 - pose[1]
         pose /= 1000
 
-        orientation = self.r @ (alpha * corner_coord - self.t)
-        orientation[1] = 2000 - orientation[1]
-        orientation /= 1000
+        coordinates = np.array(coordinates, dtype=np.float32)
+        coordinates = coordinates.reshape(4, 1, 2)
+        # print(object_corners.shape, corner_coord.shape)
 
-        # self.get_logger().info(f"Aboba \n{(orientation[0]-pose[0]), (orientation[1]-pose[1])}")
-        if (orientation[1]-pose[1]) >= 0 and (orientation[0]-pose[0]) > 0:
-            theta = np.arctan((orientation[0]-pose[0])/(orientation[1]-pose[1]))
-        elif (orientation[1]-pose[1]) >= 0 and (orientation[0]-pose[0]) < 0:
-            theta = 2 * np.pi + np.arctan((orientation[0]-pose[0])/(orientation[1]-pose[1]))
-        else:
-            theta = np.pi + np.arctan((orientation[0]-pose[0])/(orientation[1]-pose[1]))
-        if self.is_calibrated:
-            if theta >= self.default_theta:
-                theta -= self.default_theta
-            else:
-                theta = 2 * np.pi + theta - self.default_theta 
-
+        retval, rvec, tvec = cv2.solvePnP(self.object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        # cv2.drawFrameAxes(
+        #     self.image, 
+        #     self.camera_matrix, 
+        #     self.dist_coeffs, 
+        #     rvec, 
+        #     tvec, 
+        #     self.marker_length/2
+        # )
+        rotation_matrix, _ = cv2.Rodrigues(rvec)
+        theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0])
 
         return pose[:2], theta
 
@@ -118,7 +147,7 @@ class ImageSubscriber(Node):
                 for ids, corners in zip(marker_IDs, marker_corners):
                     corners = corners.reshape(4, 2)
                     corners = corners.astype(int)
-                    top_left = corners[0].ravel()
+                    # top_left = corners[0].ravel()
                     # top_right = corners[1].ravel()
                     bottom_right = corners[2].ravel()
                     # bottom_left = corners[3].ravel()
@@ -129,9 +158,12 @@ class ImageSubscriber(Node):
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, (0, 255, 0), 2)
 
-                    center = (int(top_left[0] + bottom_right[0]) // 2, int(top_left[1] + bottom_right[1]) // 2, 1)
-                    center = np.array(center)
-                    result[ids[0]] = center, np.hstack((top_left, 1))
+                    # center = (int(top_left[0] + bottom_right[0]) // 2, int(top_left[1] + bottom_right[1]) // 2, 1)
+                    # center = np.array(center)
+                    
+                    result[ids[0]] = corners
+                    # print(result[ids[0]])
+                    # result[ids[0]] = center, np.hstack((top_left, 1))
                 return result
         else:
             return None
@@ -139,7 +171,9 @@ class ImageSubscriber(Node):
     def calibrate(self):
         marker_corners, marker_IDs = self.find_markers(True)
         objPoints, imgPoints = self.board.matchImagePoints(marker_corners, marker_IDs)
-        retval, rvec, tvec = cv2.solvePnP(objPoints, imgPoints, self.camera_matrix, self.dist_coeffs)
+        print(objPoints)
+        print(imgPoints)
+        retval, rvec, tvec = cv2.solvePnP(objPoints, imgPoints, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE)
         # self.get_logger().info(f"Tvec: \n{tvec}")
         # self.get_logger().info(f"Rvec: {rvec}")
         # self.get_logger().info(f"Rmat: \n{cv2.Rodrigues(rvec)[0]}")
@@ -163,20 +197,22 @@ class ImageSubscriber(Node):
 
     def set_default(self):
         markers = self.find_markers()
-        pose, theta = self.transform(markers[69][0], markers[69][1], 435)
+        pose, theta = self.transform(markers[self.robot_marker], 435)
         # self.default_theta = 3.874187464676028
         self.default_theta = theta
         self.get_logger().info(f"Default theta: {self.default_theta}")
         self.last_x, self.last_y, self.last_theta = pose[1], -pose[0], 0
         self.get_logger().info(f"Start odometry: {self.last_x, self.last_y, self.last_theta}")
         self.last_time = self.get_clock().now().nanoseconds
-
+        self.last_time_w = self.last_time
 
     def send_tf(self, x, y, theta):
         t = TransformStamped()
 
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = 'odom'
+        # NEED FIX
+        # t.header.frame_id = 'map'
         t.child_frame_id = 'base_link'
 
         t.transform.translation.x = y
@@ -197,15 +233,28 @@ class ImageSubscriber(Node):
 
         odom.header.stamp = self.get_clock().now().to_msg()
         odom.header.frame_id = 'odom'
+        # NEED FIX
+        # odom.header.frame_id = 'map'
         
         # self.get_logger().info(f"Time: {self.get_clock().now().nanoseconds}")
 
         
         dt = (self.current_time - self.last_time) / 10**9
-        dt = 0.1
+        dt_w = (self.current_time - self.last_time_w) / 10**9
+        # dt = 0.1
         # self.get_logger().info(f"Delta time: {dt}")
 
         # self.get_logger().info(f"Pose: {y, -x}, theta: {theta}")
+        
+        vel_x, vel_y, vel_w = (y - self.last_x)/dt, (-x - self.last_y)/dt, (-theta - self.last_theta)/dt_w 
+        # vel_x, vel_y, vel_w = 0.0, 0.0, 0.0
+        if abs(vel_w) > 1:
+            self.get_logger().warn(f"W Velosity: {vel_w} {np.degrees(theta):.5f} {np.degrees(-self.last_theta):.5f}")
+            theta = -self.last_theta
+        else:
+            self.last_theta = -theta
+            self.last_time_w = self.current_time
+
 
         q = quaternion_from_euler(0, 0, -theta)
         # set the position
@@ -216,10 +265,9 @@ class ImageSubscriber(Node):
         odom.pose.pose.orientation.y = q[1]
         odom.pose.pose.orientation.z = q[2]
         odom.pose.pose.orientation.w = q[3]
-
-        vel_x, vel_y, vel_w = (y - self.last_x)/dt, (-x - self.last_y)/dt, (-theta - self.last_theta)/dt
-        self.get_logger().info(f"Velosity: {vel_x, vel_y, vel_w}")
-
+        
+        self.get_logger().info(f"Odometry: {y:.5f} {-x:.5f} {np.degrees(theta):.5f} {vel_w:.5f}")
+        # self.get_logger().info(f"Velosity: {vel_x, vel_y, vel_w}")
         # set the velocity
         odom.child_frame_id = 'base_link'
         odom.twist.twist.linear.x = vel_x
@@ -235,26 +283,54 @@ class ImageSubscriber(Node):
 
         self.odom_pub.publish(odom)
 
+        self.end_time = self.get_clock().now().nanoseconds
         
         self.last_x = y
         self.last_y = -x
-        self.last_theta = -theta
+        self.last_time = self.current_time
 
-    def image_callback(self, msg):
+    def timer_callback(self):
+        self.send_odometry(1.0, 1.0, 0)
+
+    def callback(self, msg):
+        try:
+            self.image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        except:
+            self.get_logger().warning("No image")
+
+        # FLIP IMAGE FOR REAL 
+        # self.image = cv2.flip(self.image, -1)
         self.current_time = self.get_clock().now().nanoseconds
-        self.image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-        
-        
 
+        # np_arr = np.frombuffer(msg.data, np.uint8)
+        # self.image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        h,  w = self.image.shape[:2]
+        if self.camera_matrix is None:
 
+            # FOR REAL
+            # self.camera_matrix = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
+            #     self.K, self.D, (w, h), np.eye(3), balance=0 # balance=0 (обрезка краёв) ... 1 (сохранение всех пикселей)
+            # )
+            
+            # FOR SIM
+            self.camera_matrix = np.array([[761.80910110473633, 0., 960], [0., 761.80913686752319, 540], [0., 0., 1.]], dtype=np.float32)
+            
+            self.dist_coeffs = np. array([0, 0, 0, 0, 0])
+
+        # FOR REAL
+        # undistorted = cv2.fisheye.undistortImage(self.image, self.K, self.D, None, self.camera_matrix)
+        # self.image = undistorted
+        
         if self.is_calibrated:
             try:
                 markers = self.find_markers()
                 # self.get_logger().info(f"Founded markres: {markers.keys()}")
-                pose, theta = self.transform(markers[69][0], markers[69][1], 435)
+                pose, theta = self.transform(markers[self.robot_marker], 435)
+
+                # Публикация трансформа (использовать если камера - единственный источник одометрии)
                 self.send_tf(pose[0], pose[1], theta)
+
                 self.send_odometry(pose[0], pose[1], theta)
-                self.get_logger().info(f"Odometry: {pose[0], pose[1], theta}")
             except Exception as e:
                 self.get_logger().warning(f"Error finding: {e}")
         else:
@@ -264,8 +340,12 @@ class ImageSubscriber(Node):
             # # self.get_logger().info(f"Coordinates: {result}")
             except Exception as e:
                 self.get_logger().error(f'Error calibrating: {e}')
-        self.last_time = self.current_time
-
+        # self.get_logger().info(self.get_clock().now().to_msg())
+        # self.end_start_timetime = self.get_clock().now().nanoseconds
+        # print(self.start_time, self.end_time)
+        
+        
+        # cv2.putText(self.image, "Ping = " + str((self.end_time - self.start_time)//(10**6)) + "ms", (self.image.shape[1] - 400, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         cv2.imshow("Camera Image", self.image)
         key = cv2.waitKey(1)
         if key == ord('c'):
@@ -276,7 +356,7 @@ class ImageSubscriber(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ImageSubscriber()
+    node = CusCamera()
     try:
         rclpy.spin(node)
     except SystemExit:
