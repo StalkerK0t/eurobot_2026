@@ -30,3 +30,31 @@ ros2 launch shesnar launch_sim.launch.py use_sim_time:=True
 ``` 
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/cmd_vel
 ```
+
+
+## Шпаргалка по gz и ros
+Список запущенных топиков:
+``` 
+ros2 topic list  # ROS
+gz topic -l      # Gazebo
+```
+
+Вывести данные из топика (послушать):
+``` 
+ros2 topic echo /tf   # ROS
+gz topic -e -t /tf    # Gazebo
+``` 
+
+Построить граф трансформов:
+``` 
+ros2 run tf2_tools view_frames
+```
+
+Построить граф трансформов:
+``` 
+ros2 topic hz /tf
+```
+Запуск фильтра Калмана вручную
+```
+ros2 run robot_localization ekf_node --ros-args --params-file src/shesnar/config/ekf_params.yaml
+```

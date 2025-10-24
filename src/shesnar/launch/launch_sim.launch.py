@@ -48,6 +48,20 @@ def generate_launch_description():
                 )]), launch_arguments={'use_sim_time': 'true'}.items()
     )
 
+    config_ekf= os.path.join(get_package_share_directory("shesnar"),'config','ekf_params.yaml')
+
+    ekf = Node(
+        package = 'robot_localization',
+        name = 'ekf_filter_node',
+        executable = 'ekf_node',
+        output="screen",
+        parameters=[config_ekf],
+    )
+
+    delayed_ekf = TimerAction(
+    period=3.0,
+    actions=[ekf]
+)
 
     default_world = os.path.join(
             get_package_share_directory(package_name),
@@ -162,6 +176,7 @@ def generate_launch_description():
 
         start_localization,
         start_navigation,
-        
+        delayed_ekf
+        # ekf
         # start_route_controller,
     ])

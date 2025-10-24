@@ -43,7 +43,7 @@ class CusCamera(Node):
         super().__init__('cus_camera')
         self.get_logger().info(f"OpenCV version: {cv2.__version__}")
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',rclpy.Parameter.Type.BOOL, True)])
-        self.odom_pub = self.create_publisher(Odometry, 'odom', 1000)
+        self.odom_pub = self.create_publisher(Odometry, 'camera_odom', 1000)
 
         qos_profile = QoSProfile(
             depth=2,
@@ -210,16 +210,15 @@ class CusCamera(Node):
         t = TransformStamped()
 
         t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = 'odom'
-        # NEED FIX
-        # t.header.frame_id = 'map'
+        t.header.frame_id = 'map'
         t.child_frame_id = 'base_link'
 
         t.transform.translation.x = y
         t.transform.translation.y = -x
         t.transform.translation.z = 0.01
 
-        q = quaternion_from_euler(0, 0, -theta)
+        q = quaternion_from_euler(0, 0, theta)
+        # q = quaternion_from_euler(0, 0, -theta)
         # self.get_logger().info(f"Orientation: {q}")
         t.transform.rotation.x = q[0]
         t.transform.rotation.y = q[1]
@@ -232,9 +231,7 @@ class CusCamera(Node):
         odom = Odometry()
 
         odom.header.stamp = self.get_clock().now().to_msg()
-        odom.header.frame_id = 'odom'
-        # NEED FIX
-        # odom.header.frame_id = 'map'
+        odom.header.frame_id = 'map'
         
         # self.get_logger().info(f"Time: {self.get_clock().now().nanoseconds}")
 
@@ -246,17 +243,27 @@ class CusCamera(Node):
 
         # self.get_logger().info(f"Pose: {y, -x}, theta: {theta}")
         
-        vel_x, vel_y, vel_w = (y - self.last_x)/dt, (-x - self.last_y)/dt, (-theta - self.last_theta)/dt_w 
+        vel_x, vel_y, vel_w = (y - self.last_x)/dt, (-x - self.last_y)/dt, (theta - self.last_theta)/dt_w 
+
+        # vel_x, vel_y, vel_w = (y - self.last_x)/dt, (-x - self.last_y)/dt, (-theta - self.last_theta)/dt_w 
         # vel_x, vel_y, vel_w = 0.0, 0.0, 0.0
+        # if abs(vel_w) > 1:
+        #     self.get_logger().warn(f"W Velosity: {vel_w} {np.degrees(theta):.5f} {np.degrees(-self.last_theta):.5f}")
+        #     theta = -self.last_theta
+        # else:
+        #     self.last_theta = -theta
+        #     self.last_time_w = self.current_time
+
         if abs(vel_w) > 1:
-            self.get_logger().warn(f"W Velosity: {vel_w} {np.degrees(theta):.5f} {np.degrees(-self.last_theta):.5f}")
-            theta = -self.last_theta
+            self.get_logger().warn(f"W Velosity: {vel_w} {np.degrees(theta):.5f} {np.degrees(self.last_theta):.5f}")
+            theta = self.last_theta
         else:
-            self.last_theta = -theta
+            self.last_theta = theta
             self.last_time_w = self.current_time
 
 
-        q = quaternion_from_euler(0, 0, -theta)
+        # q = quaternion_from_euler(0, 0, -theta)
+        q = quaternion_from_euler(0, 0, theta)
         # set the position
         odom.pose.pose.position.x = y
         odom.pose.pose.position.y = -x
@@ -328,7 +335,7 @@ class CusCamera(Node):
                 pose, theta = self.transform(markers[self.robot_marker], 435)
 
                 # Публикация трансформа (использовать если камера - единственный источник одометрии)
-                self.send_tf(pose[0], pose[1], theta)
+                # self.send_tf(pose[0], pose[1], theta)
 
                 self.send_odometry(pose[0], pose[1], theta)
             except Exception as e:
