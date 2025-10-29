@@ -24,7 +24,13 @@
 
 Через терминал:
 ```
-ros2 topic pub /custom_cost map_points std_msgs/msg/String "{data: "B"}"
+ros2 topic pub /keepout_zone map_points std_msgs/msg/String "{data: "B"}"
 ```
 
-Через планировщик маршрута:
+Через планировщик маршрута :
+```
+self.publisher_ = self.create_publisher(String, '/keepout_zone', 10)
+msg = String()
+msg.data = "B"  
+self.publisher_.publish(msg)
+```
