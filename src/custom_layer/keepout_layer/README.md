@@ -16,7 +16,7 @@
                              2.625, 1.775, 0.45, 0.45,] # J 
 ``` 
 
-![keepout layer]([docs/keepout.png](https://github.com/StalkerK0t/eurobot_2026/blob/nonepenguin/src/custom_layer/keepout_layer/docs/table_FINALE_1.0_keepout.png))
+![keepout layer](https://github.com/StalkerK0t/eurobot_2026/raw/nonepenguin/src/custom_layer/keepout_layer/docs/table_FINALE_1.0_keepout.png)
 
 Возможные проблемы: система координат на реальном поле и в симуляции должны совпадать (или придётся изменять эти значения).
 
