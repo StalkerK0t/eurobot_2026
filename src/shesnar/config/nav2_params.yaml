@@ -245,9 +245,8 @@ global_costmap:
       robot_radius: 0.25 #0.22
       resolution: 0.05
       track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
-      # plugins: ["static_layer", "obstacle_layer", "inflation_layer", "keepout_layer"]
-     # plugins: ["static_layer", "obstacle_layer", "inflation_layer", "custom_costmap_layer"]
+      # plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer", "keepout_layer"]     
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -269,42 +268,25 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
         inflation_radius: 0.27
-      # custom_costmap_layer:
-      #   plugin: "custom_costmap_layer::CustomLayer"
-      #   radius: 0.1
-      # keepout_layer:
-      #   plugin: "keepout_costmap_plugin::KeepoutLayer"
-      #   enabled: True
-      #   # keepout_zone_array: [X, Y, lengthX, lengthY]
-      #   # keepout_zone_array: [0.375, 1.775, 0.45, 0.45,  # A
-      #   #                      0.225, 0.875, 0.45, 0.45,  # B
-      #   #                      0.225, 0.075, 0.45, 0.15,  # C
-      #   #                      0.775, 0.075, 0.45, 0.15,  # D
-      #   #                      1.225, 0.225, 0.45, 0.45,  # E
-      #   #                      #----------------------------#
-      #   #                      1.775, 0.225, 0.45, 0.45,  # F
-      #   #                      2.225, 0.075, 0.45, 0.15,  # G
-      #   #                      2.775, 0.075, 0.45, 0.15,  # H
-      #   #                      2.775, 0.875, 0.45, 0.45,  # I
-      #   #                      2.625, 1.775, 0.45, 0.45,] # J 
+      keepout_layer:
+        plugin: "keepout_costmap_plugin::KeepoutLayer"
+        enabled: True
+        # формат [X, Y, lengthX, lengthY]
+        keepout_zone_array: [0.375, 1.775, 0.45, 0.45,  # A
+                             0.225, 0.875, 0.45, 0.45,  # B
+                             0.225, 0.075, 0.45, 0.15,  # C
+                             0.775, 0.075, 0.45, 0.15,  # D
+                             1.225, 0.225, 0.45, 0.45,  # E
+                             #----------------------------#
+                             1.775, 0.225, 0.45, 0.45,  # F
+                             2.225, 0.075, 0.45, 0.15,  # G
+                             2.775, 0.075, 0.45, 0.15,  # H
+                             2.775, 0.875, 0.45, 0.45,  # I
+                             2.625, 1.775, 0.45, 0.45,] # J 
+    #                        1.76, -1.46, 0.12, 0.4,] # scene                             
 
-      #   keepout_zone_array: [1.8, -0.38, 0.12, 0.12,  # A
-      #                        0.888, -0.1997, 0.12, 0.12,  # B
-      #                        0.191, -0.22806, 0.005, 0.12,  # C
-      #                        0.163, -0.754, 0.005, 0.12,  # D
-      #                        0.163, -1.203, 0.12, 0.12,  # E
-      #                        #----------------------------#
-      #                        0.163, -1.754, 0.12, 0.12,  # F
-      #                        0.163, -2.244, 0.005, 0.12,  # G
-      #                        0.19, -2.79, 0.005, 0.12,  # H
-      #                        0.87, -2.79, 0.12, 0.12,  # I
-      #                        1.794, -2.62, 0.12, 0.12,   #J
-      #                        1.76, -1.46, 0.12, 0.4,] # scene
-      #                       #  1.76, 0.055, 0.001, 0.1, # scene board1
-      #                       #  1.76, -0.997, 0.001, 0.1,] # scene board2
-
-      #   inflation_length: 0.1
-      #   cost_scaling_factor: 5.0
+        inflation_length: 0.1
+        cost_scaling_factor: 5.0
      
       always_send_full_costmap: True
 
