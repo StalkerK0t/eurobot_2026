@@ -1,0 +1,6 @@
+route_controller:
+  ros__parameters:
+    points:
+      - [0.54, -0.26,   1.57, 
+         0.30, -0.82, -1.57]
+    time_until_end: 93
