@@ -137,13 +137,23 @@ def generate_launch_description():
     # )
 
     nav_params = os.path.join(get_package_share_directory(package_name),'config','nav2_params.yaml')
+    # start_localization = IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([os.path.join(
+    #                 get_package_share_directory(package_name),'launch','localization_launch.py'
+    #             )]), 
+    #             # condition=IfCondition( is_localization ), 
+    #             launch_arguments={'map': map_file_path, 'use_sim_time': 'true', 'params_file': nav_params}.items()
+    # )
+
     start_localization = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory(package_name),'launch','localization_launch.py'
-                )]), 
-                # condition=IfCondition( is_localization ), 
-                launch_arguments={'map': map_file_path, 'use_sim_time': 'true', 'params_file': nav_params}.items()
-    )
+                            PythonLaunchDescriptionSource(
+                                PathJoinSubstitution(
+                                    [
+                                        FindPackageShare("lidar_localization"),
+                                        "launch",
+                                        "lidar_localization.launch.py",
+                                    ]
+                                )))
     
     start_navigation = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
