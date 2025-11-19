@@ -153,8 +153,11 @@ def generate_launch_description():
                                         "launch",
                                         "lidar_localization.launch.py",
                                     ]
-                                )))
+                                )),
+                                launch_arguments={'map': map_file_path, 'use_sim_time': 'true'}.items()
+                                )
     
+    nav_params = os.path.join(get_package_share_directory(package_name),'config','nav2_params.yaml')
     start_navigation = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','navigation_launch.py'
@@ -162,19 +165,11 @@ def generate_launch_description():
                 # condition=IfCondition( is_navigation ), 
                 launch_arguments={'use_sim_time': 'true', 'map_subscribe_transient_local': 'true', 'params_file': nav_params}.items()
     )
+  
 
-
-    # start_route_controller = Node(
-    #     package="route_controller",
-    #     executable="driver",
-    #     arguments=[
-    #     ],
-    #     parameters = [{'use_sim_time': True}]
-    # )    
-
-    drive_controller = PathJoinSubstitution(
-        [FindPackageShare('drive_controller'), 'launch', 'drive_controller.launch.py']
-    )
+    # drive_controller = PathJoinSubstitution(
+    #     [FindPackageShare('drive_controller'), 'launch', 'drive_controller.launch.py']
+    # )
 
     
     # Launch them all!
@@ -191,11 +186,10 @@ def generate_launch_description():
         move_control,
         start_camera_node,
 
+        delayed_ekf,
         start_localization,
         start_navigation,
-        delayed_ekf,
 
-        IncludeLaunchDescription(PythonLaunchDescriptionSource(drive_controller)),
+        # IncludeLaunchDescription(PythonLaunchDescriptionSource(drive_controller)),
         # ekf,
-        # start_route_controller,
     ])
