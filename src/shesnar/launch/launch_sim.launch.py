@@ -137,25 +137,25 @@ def generate_launch_description():
     # )
 
     nav_params = os.path.join(get_package_share_directory(package_name),'config','nav2_params.yaml')
-    # start_localization = IncludeLaunchDescription(
-    #             PythonLaunchDescriptionSource([os.path.join(
-    #                 get_package_share_directory(package_name),'launch','localization_launch.py'
-    #             )]), 
-    #             # condition=IfCondition( is_localization ), 
-    #             launch_arguments={'map': map_file_path, 'use_sim_time': 'true', 'params_file': nav_params}.items()
-    # )
-
     start_localization = IncludeLaunchDescription(
-                            PythonLaunchDescriptionSource(
-                                PathJoinSubstitution(
-                                    [
-                                        FindPackageShare("lidar_localization"),
-                                        "launch",
-                                        "lidar_localization.launch.py",
-                                    ]
-                                )),
-                                launch_arguments={'map': map_file_path, 'use_sim_time': 'true'}.items()
-                                )
+                PythonLaunchDescriptionSource([os.path.join(
+                    get_package_share_directory(package_name),'launch','localization_launch.py'
+                )]), 
+                # condition=IfCondition( is_localization ), 
+                launch_arguments={'map': map_file_path, 'use_sim_time': 'true', 'params_file': nav_params}.items()
+    )
+
+    # start_localization = IncludeLaunchDescription(
+    #                         PythonLaunchDescriptionSource(
+    #                             PathJoinSubstitution(
+    #                                 [
+    #                                     FindPackageShare("lidar_localization"),
+    #                                     "launch",
+    #                                     "lidar_localization.launch.py",
+    #                                 ]
+    #                             )),
+    #                             launch_arguments={'map': map_file_path, 'use_sim_time': 'true'}.items()
+    #                             )
     
     nav_params = os.path.join(get_package_share_directory(package_name),'config','nav2_params.yaml')
     start_navigation = IncludeLaunchDescription(
@@ -165,13 +165,18 @@ def generate_launch_description():
                 # condition=IfCondition( is_navigation ), 
                 launch_arguments={'use_sim_time': 'true', 'map_subscribe_transient_local': 'true', 'params_file': nav_params}.items()
     )
-  
-
-    # drive_controller = PathJoinSubstitution(
-    #     [FindPackageShare('drive_controller'), 'launch', 'drive_controller.launch.py']
-    # )
-
     
+    drive_controller_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare("drive_controller"),
+                "launch",
+                "drive_controller.launch.py",
+            ])
+        ])  
+    )
+
+
     # Launch them all!
     return LaunchDescription([        
         world_arg,
@@ -189,6 +194,8 @@ def generate_launch_description():
         delayed_ekf,
         start_localization,
         start_navigation,
+
+        drive_controller_launch,
 
         # IncludeLaunchDescription(PythonLaunchDescriptionSource(drive_controller)),
         # ekf,
