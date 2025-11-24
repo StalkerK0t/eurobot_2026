@@ -32,6 +32,9 @@ from rclpy.node import Node
 from rclpy.qos import QoSDurabilityPolicy, QoSHistoryPolicy, QoSReliabilityPolicy
 from rclpy.qos import QoSProfile
 
+from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.parameter import ParameterType
+
 from std_msgs.msg import String
 from std_msgs.msg import UInt8, Int16
 
@@ -44,20 +47,24 @@ class NavigationResult(Enum):
 
 class BasicNavigator(Node):
     def __init__(self):
-        super().__init__(node_name='drive_controller')
+        super().__init__(node_name='drive_controller')        
 
-        raw_points = self.declare_parameter('points')     # последовательность точек загрузки/разгрузки   
-        self.time_until_end = self.declare_parameter('time_until_end')    
+        self.declare_parameter('points', [0.0])    # последовательность точек загрузки/разгрузки   
+        self.declare_parameter('time_until_end')    
 
         # Read params from YAML
         raw_points = self.get_parameter("points").get_parameter_value().double_array_value
+
+        self.get_logger().info(f"START NAVIGATOR {raw_points}, {len(raw_points)}")
+
         self.points = []
         for i in range(0, len(raw_points), 3): 
             self.points.append({
                 'x': raw_points[i],
                 'y': raw_points[i+1],
                 'yaw': raw_points[i+2]
-            })       
+            })    
+
         self.time_until_end = self.get_parameter("time_until_end").get_parameter_value().integer_value             
 
         self.initial_pose = PoseStamped()
@@ -138,15 +145,21 @@ class BasicNavigator(Node):
             self.start_timer = time.time()
 
     def timer_callback(self):
+        self.get_logger().info(f"in timer callback: wait nav2")
         self.waitUntilNav2Active()
+        self.get_logger().info(f"in timer callback: nav2 start")
 
-        if self.start_timer is not None:
+        if self.start_timer is not None:            
             self.get_logger().info(f"Time = {time.time() - self.start_timer}")
 
             # when time is up, go to final point 
             if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
                 self.get_logger().info(f"Len wayp = {len(self.points)}")                
-                self.go_to_pose( self.set_goal_pose(len(self.points) - 1) )
+                if (len(self.points) - 1) < 0:
+                    index = 0
+                else:
+                    index = len(self.points) - 1
+                self.go_to_pose( self.set_goal_pose( index ) )
             else:
                 pass            
 
