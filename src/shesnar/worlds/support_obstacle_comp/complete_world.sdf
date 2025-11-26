@@ -76,52 +76,6 @@
     name="gz::sim::systems::Contact">
   </plugin> -->
 
- <model name='cargo_2'>
-      <pose>0.825 -1.425 .3 0 0 0</pose>
-      <link name='grip_link_2'>
-        <inertial>
-          <inertia>
-            <ixx>2.98e-4</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>4.67e-3</iyy>
-            <iyz>0</iyz>
-            <izz>4.95e-3</izz>
-          </inertia>
-          <mass>0.35</mass>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='box_collision_2'>
-          <geometry>
-            <box>
-              <size>0.15 0.05 0.03</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='box_visual_2'>
-          <geometry>
-            <box>
-              <size>0.15 0.05 0.03</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0.29 0.16 0.12 1</ambient>
-            <diffuse>0.29 0.16 0.12 1</diffuse>
-            <specular>1 1 1 1</specular>
-          </material>
-        </visual>
-        <pose>0 0 0 0 0 0</pose>
-        <enable_wind>false</enable_wind>
-      </link>
-      <static>false</static>
-    </model>
 
 <include>
   <uri>file:///eurobot_2026/src/shesnar/worlds/support_obstacle_comp/cargoes.sdf</uri>
@@ -132,7 +86,7 @@
 
 
 
- 
+   
 
 
 
