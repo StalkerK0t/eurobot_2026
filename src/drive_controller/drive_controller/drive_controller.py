@@ -55,7 +55,7 @@ class BasicNavigator(Node):
         # Read params from YAML
         raw_points = self.get_parameter("points").get_parameter_value().double_array_value
 
-        self.get_logger().info(f"START NAVIGATOR {raw_points}, {len(raw_points)}")
+      #  self.get_logger().info(f"START NAVIGATOR {raw_points}, {len(raw_points)}")
 
         self.points = []
         for i in range(0, len(raw_points), 3): 
@@ -117,20 +117,18 @@ class BasicNavigator(Node):
         self.get_costmap_global_srv = self.create_client(GetCostmap, '/global_costmap/get_costmap')
         self.get_costmap_local_srv = self.create_client(GetCostmap, '/local_costmap/get_costmap')
 
+        self.waitUntilNav2Active()  
         self.create_timer(1, self.timer_callback)
 
-    @staticmethod
-    def set_goal_pose(self, waypoint_index):
-        time_ = self.get_clock().now().to_msg()
-
-        yaw = self.waypoints[waypoint_index]['yaw']
+    def set_goal_pose(self, waypoint_index : int = 0):        
+        yaw = self.points[waypoint_index]['yaw']
         quaternion = quaternion_from_euler(0, 0, yaw)
 
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
-        goal_pose.header.stamp = time
+        goal_pose.header.stamp = self.get_clock().now().to_msg()
         goal_pose.pose.position.x = float( self.points[waypoint_index]['x'] )
-        goal_pose.pose.position.y = float( self.waypoints[waypoint_index]['y'] )
+        goal_pose.pose.position.y = float( self.points[waypoint_index]['y'] )
         goal_pose.pose.position.z = 0.0
         goal_pose.pose.orientation.x = quaternion[0]
         goal_pose.pose.orientation.y = quaternion[1]
@@ -144,21 +142,20 @@ class BasicNavigator(Node):
             self.get_logger().debug("Start")
             self.start_timer = time.time()
 
-    def timer_callback(self):
-        self.get_logger().info(f"in timer callback: wait nav2")
-        self.waitUntilNav2Active()
-        self.get_logger().info(f"in timer callback: nav2 start")
-
+    def timer_callback(self):        
         if self.start_timer is not None:            
             self.get_logger().info(f"Time = {time.time() - self.start_timer}")
 
             # when time is up, go to final point 
-            if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
+            # if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
+            if True:
                 self.get_logger().info(f"Len wayp = {len(self.points)}")                
                 if (len(self.points) - 1) < 0:
                     index = 0
                 else:
                     index = len(self.points) - 1
+
+                self.get_logger().info(f"index {index}")
                 self.go_to_pose( self.set_goal_pose( index ) )
             else:
                 pass            
@@ -207,17 +204,6 @@ class BasicNavigator(Node):
                                                                    self._feedbackCallback)
 
         self.send_goal_future.add_done_callback(self.goal_response_callback)
-
-        # rclpy.spin_until_future_complete(self, send_goal_future)
-        # self.goal_handle = send_goal_future.result()
-
-        # if not self.goal_handle.accepted:
-        #     self.error('Goal to ' + str(pose.pose.position.x) + ' ' +
-        #                    str(pose.pose.position.y) + ' was rejected!')
-        #     return False
-
-        # self.result_future = self.goal_handle.get_result_async()
-        # return True
 
     def goal_response_callback(self, future):
         goal_handle = future.result()

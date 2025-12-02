@@ -257,8 +257,5 @@ def generate_launch_description():
         start_localization,
         start_navigation,
 
-        # drive_controller_launch,
-
-        # IncludeLaunchDescription(PythonLaunchDescriptionSource(drive_controller)),
-        # ekf,
+        drive_controller_launch,
     ])
