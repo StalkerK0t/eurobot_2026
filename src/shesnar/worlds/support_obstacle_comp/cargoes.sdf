@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<sdf version="1.9">
+<sdf version="1.10">
   <model name="all_cargo">
     <model name='group_1'>
 
@@ -39,10 +39,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -85,10 +87,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -131,10 +135,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -177,10 +183,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -225,10 +233,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -271,10 +281,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -317,10 +329,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -363,10 +377,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -411,10 +427,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -457,10 +475,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -503,10 +523,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -549,10 +571,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -597,10 +621,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -643,10 +669,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -689,10 +717,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -735,10 +765,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -783,10 +815,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -829,10 +863,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -875,10 +911,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -921,10 +959,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -969,10 +1009,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1015,10 +1057,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1061,10 +1105,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1107,10 +1153,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1155,10 +1203,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1201,10 +1251,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1247,10 +1299,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1293,10 +1347,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1341,10 +1397,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1387,10 +1445,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1433,10 +1493,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1479,10 +1541,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1527,10 +1591,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1573,10 +1639,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1619,10 +1687,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1665,10 +1735,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.976 0.498 0.063 1</ambient>
-              <diffuse> 0.976 0.498 0.063 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</ambient>
+              <diffuse> 0.9764705882352941 0.4980392156862745 0.06274509803921569 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1713,10 +1785,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1759,10 +1833,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1805,10 +1881,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
@@ -1851,10 +1929,12 @@
               </box>
             </geometry>
             <material>
-              <ambient> 0.0 0.357 0.549 1</ambient>
-              <diffuse> 0.0 0.357 0.549 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <ambient> 0.0 0.3568627450980392 0.5490196078431373 1</ambient>
+              <diffuse> 0.0 0.3568627450980392 0.5490196078431373 1</diffuse>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>

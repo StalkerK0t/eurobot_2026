@@ -2,8 +2,9 @@
   <world name='empty'>
     <scene>
       <shadows>false</shadows>
-      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
-      <background>0.699999988 0.699999988 0.699999988 1</background>
+      <ambient>0.0 0.0 0.0 1</ambient>
+      <background>0 0 0 1</background>
+      <gamma_correction>false</gamma_correction>
     </scene>
 
     <physics name='1ms' type='ignored'>
@@ -1482,16 +1483,16 @@
 
 
   <light name='sun' type='directional'>
-      <pose>0 0 10 0 0 0</pose>
+      <pose>0 0 20 0 0 0</pose>
       <cast_shadows>true</cast_shadows>
       <intensity>1</intensity>
-      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
-      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
-      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <direction>0.0 0.0 -1.0</direction>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.0 0.0 0.0 1</specular>
       <attenuation>
         <range>1000</range>
         <linear>0.01</linear>
-        <constant>0.90000000000000002</constant>
+        <constant>0.9</constant>
         <quadratic>0.001</quadratic>
       </attenuation>
       <spot>
@@ -1502,3 +1503,9 @@
   </light>
   </world>
 </sdf>
+
+
+  
+
+
+

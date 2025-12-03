@@ -2,9 +2,9 @@ import os
 import yaml
 
 color_dict = {
-    0: [0.0, 0.357, 0.549],    # [0, 91, 140] -> [0.0, 91/255, 140/255]
-    1: [0.976, 0.498, 0.063],  # [249, 127, 16] -> [249/255, 127/255, 16/255]
-    2: [0.165, 0.161, 0.165]   # [42, 41, 42] -> [42/255, 41/255, 42/255]
+    0: [0.0, 91/255, 140/255],    # [0, 91, 140] -> [0.0, 91/255, 140/255] синий
+    1: [249/255, 127/255, 16/255],  # потом будет оранжевый
+    2: [0.0, 0.0, 0.0]   # [42, 41, 42] -> [42/255, 41/255, 42/255]
 }
 combinations_dict={
     0: (0,0,0,0),
@@ -38,7 +38,7 @@ def create_cargo_positions(input_path, output_path):
 
     
     sdf_content = '''<?xml version="1.0"?>
-<sdf version="1.9">
+<sdf version="1.10">
   <model name="all_cargo">
 '''
     
@@ -103,8 +103,10 @@ def create_cargo_positions(input_path, output_path):
             <material>
               <ambient> {red} {green} {blue} 1</ambient>
               <diffuse> {red} {green} {blue} 1</diffuse>
-              <specular>1 1 1 1</specular>
+              <specular>0 0 0 0</specular>
+              <emissive>0 0 0 1</emissive> 
             </material>
+            <gamma_correction>false</gamma_correction>
           </visual>
           <pose>0 0 0 0 0 0</pose>
           <enable_wind>false</enable_wind>
