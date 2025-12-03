@@ -167,8 +167,14 @@ class BasicNavigator(Node):
             # when time is up, go to final point 
             # if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
             if (time.time() - self.start_timer) < self.time_until_end:
-                self.get_logger().info(f"Len wayp = {len(self.points)}, current_point = {self.current_point}")                
-                self.go_to_pose( self.set_goal_pose( self.current_point ) )
+                self.get_logger().info(f"Len wayp = {len(self.points)}, current_point = {self.current_point}")  
+                if self.current_point < len(self.points)0:
+                    self.go_to_pose( self.set_goal_pose( self.current_point ) )
+                else:
+                    index = len(self.points) - 1 # Base (last point)
+                    self.go_to_pose( self.set_goal_pose( index ) )   
+                    self.get_logger().info(f"The end?")
+                    break
 
             else:
                 self.get_logger().info(f"Go to the base. Time = {time.time() - self.start_timer}, Points = {len(self.points)}")    
@@ -261,22 +267,22 @@ class BasicNavigator(Node):
         self.debug('Goal succeeded!')
         return True
 
-    # def isNavComplete(self):
-    #     if not self.result_future:
-    #         # task was cancelled or completed
-    #         return True
-    #     rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
-    #     if self.result_future.result():
-    #         self.status = self.result_future.result().status
-    #         if self.status != GoalStatus.STATUS_SUCCEEDED:
-    #             self.debug('Goal with failed with status code: {0}'.format(self.status))
-    #             return True
-    #     else:
-    #         # Timed out, still processing, not complete yet
-    #         return False
+    def isNavComplete(self):
+        if not self.result_future:
+            # task was cancelled or completed
+            return True
+        rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
+        if self.result_future.result():
+            self.status = self.result_future.result().status
+            if self.status != GoalStatus.STATUS_SUCCEEDED:
+                self.debug('Goal with failed with status code: {0}'.format(self.status))
+                return True
+        else:
+            # Timed out, still processing, not complete yet
+            return False
 
-    #     self.debug('Goal succeeded!')
-    #     return True
+        self.debug('Goal succeeded!')
+        return True
 
     def getFeedback(self):
         return self.feedback
