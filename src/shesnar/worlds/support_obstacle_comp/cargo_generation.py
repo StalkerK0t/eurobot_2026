@@ -1,25 +1,26 @@
 import os
 import yaml
+import random
 
 color_dict = {
-    0: [0.0, 91/255, 140/255],    # [0, 91, 140] -> [0.0, 91/255, 140/255] синий
-    1: [249/255, 127/255, 16/255],  # потом будет оранжевый
-    2: [0.0, 0.0, 0.0]   # [42, 41, 42] -> [42/255, 41/255, 42/255]
+    0: [0.0, 0.068, 0.325],    # синий
+    1: [0.93, 0.2, 0.007],  # оранжевый
+    2: [0.0, 0.0, 0.0]   # черный
 }
 combinations_dict={
     0: (0,0,0,0),
     1: (0,0,0,1),
     2: (0,0,1,0),
-    3: (0,0,1,1),
+    3: (0,0,1,1),#
     4: (0,1,0,0),
-    5: (0,1,0,1),
-    6: (0,1,1,0),
+    5: (0,1,0,1),#
+    6: (0,1,1,0),#
     7: (0,1,1,1),
     8: (1,0,0,0),
-    9: (1,0,0,1),
-    10: (1,0,1,0),
+    9: (1,0,0,1),#
+    10: (1,0,1,0),#
     11: (1,0,1,1),
-    12: (1,1,0,0),
+    12: (1,1,0,0),#
     13: (1,1,0,1),
     14: (1,1,1,0),
     15: (1,1,1,1),
@@ -43,11 +44,17 @@ def create_cargo_positions(input_path, output_path):
 '''
     
     group=0
-    for j, group_data in config.items():
+    for group_name, group_data in config.items():
         
+        if group_name=="randomize": continue
         if not group_data.get('active', True): continue
+        
+        if config.get('randomize', True):
+            two_ones_index=(3,5,6,9,10,12)
+            color_combination=combinations_dict.get(random.choice(two_ones_index))
+        else:
+            color_combination=combinations_dict.get(group_data['is_color'])
 
-        color_combination=combinations_dict.get(group_data['is_color'])
         
         if len(group_data['coords']) >= 6:
             group+=1
@@ -62,8 +69,16 @@ def create_cargo_positions(input_path, output_path):
             sdf_content += f'''    <model name='group_{group}'>\n'''
 
             for i in range(group_data['elements']):
-                color=color_dict.get(color_combination[i])
-                red, green, blue= color
+                if i < len(color_combination):
+                    color_index = color_combination[i]
+                else:
+                    color_index = 0  
+                    
+                color = color_dict.get(color_index)
+                
+                r_emiss = 0.2 if (color_index == 1) else 0
+                
+                red, green, blue = color
                 sdf_content += f'''
       <model name='cargo_{group}_{i+1}'>
         <pose>{x:.3f} {y:.3f} {z:.3f} {x_rot} {y_rot} {z_rot}</pose>
@@ -103,8 +118,8 @@ def create_cargo_positions(input_path, output_path):
             <material>
               <ambient> {red} {green} {blue} 1</ambient>
               <diffuse> {red} {green} {blue} 1</diffuse>
-              <specular>0 0 0 0</specular>
-              <emissive>0 0 0 1</emissive> 
+              <specular>0 0 0 1</specular>
+              <emissive>{r_emiss} 0.05 0.0  1</emissive>
             </material>
             <gamma_correction>false</gamma_correction>
           </visual>

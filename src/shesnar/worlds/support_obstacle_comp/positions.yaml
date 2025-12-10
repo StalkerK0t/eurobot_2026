@@ -1,12 +1,18 @@
 
-# first_group:
-#   coords: [0.825, -1.117, .15, 0, 0, 0]
-#   is_color: 3
-#   active: true
+
+randomize: True
+first_group:
+  elements: 4
+
+  coords: [1.22, -0.21, .15, 0, 0, 1.57]
+  is_color: 5
+  active: true
 
 second_group:
+  active: true
   elements: 4
-  coords: [0.825, -1.117, .15, 0, 0, 0]
+
+  coords: [0.425, -0.21, .15, 0, 0, 1.57]
   is_color: 5
   active: true
 
@@ -19,41 +25,29 @@ third_group:
 
 thouth_group:
   elements: 4
+  coords: [0.825, -1.117, .15, 0, 0, 0]
+  is_color: 5
 
-  coords: [.22, -1.92, .15, 0, 0, 0]
-  is_color: 9
-  active: true
 
 five_group:
+  active: true
   elements: 4
 
-  coords: [0.825, -1.88, .15, 0, 0, 0]
-  is_color: 5
+  coords: [1.7, -0.82, .2, 0, 0, 0]
+  is_color: 15
   active: true
+
 
 
 six_group:
-  elements: 4
-
-  coords: [1.22, -0.21, .15, 0, 0, 1.57]
-  is_color: 5
-  active: true
-
-seven_group:
   elements: 4
 
   coords: [1.22, -2.83, .15, 0, 0, 1.57]
   is_color: 5
   active: true
 
-eight_group:
-  elements: 4
 
-  coords: [0.425, -0.21, .15, 0, 0, 1.57]
-  is_color: 5
-  active: true
-
-nine_group:
+seven_group:
   elements: 4
 
   coords: [0.425, -2.83, .15, 0, 0, 1.57]
@@ -61,19 +55,31 @@ nine_group:
   active: true
 
 
-ten_group:
+eight_group:
   elements: 4
 
-  coords: [1.7, -0.82, .2, 0, 0, 0]
-  is_color: 15
+  coords: [.22, -1.92, .15, 0, 0, 0]
+  is_color: 9
   active: true
 
-eleven_group:
+nine_group:
+  elements: 4
+
+  coords: [0.825, -1.88, .15, 0, 0, 0]
+  is_color: 5
+  active: true
+
+
+
+ten_group:
+  active: true
   elements: 4
 
   coords: [1.7, -2.22, .2, 0, 0, 0]
   is_color: 0
-  active: true
+
+
+
 
 
 
