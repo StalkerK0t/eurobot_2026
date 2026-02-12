@@ -152,13 +152,12 @@ class BasicNavigator(Node):
             # if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
             if (time.time() - self.start_timer) < self.time_until_end:
                 self.get_logger().info(f"Len wayp = {len(self.points)}, current_point = {self.current_point}")  
-                if self.current_point < len(self.points)0:
+                if self.current_point < len(self.points):
                     self.go_to_pose( self.set_goal_pose( self.current_point ) )
                 else:
                     index = len(self.points) - 1 # Base (last point)
                     self.go_to_pose( self.set_goal_pose( index ) )   
-                    self.get_logger().info(f"The end?")
-                    break
+                    self.get_logger().info(f"The end?")                    
 
             else:
                 self.get_logger().info(f"Go to the base. Time = {time.time() - self.start_timer}, Points = {len(self.points)}")    
