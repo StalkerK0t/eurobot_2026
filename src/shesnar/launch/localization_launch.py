@@ -28,6 +28,9 @@ from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode, ParameterFile
 from nav2_common.launch import RewrittenYaml
 
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
+
 
 def generate_launch_description():
     # Get the launch directory
@@ -117,6 +120,10 @@ def generate_launch_description():
         'log_level', default_value='info', description='log level'
     )
 
+    obstacle_detector_params = PathJoinSubstitution(
+        [FindPackageShare("obstacle_detector"), "config", "obstacle_config.yaml"]
+    )    
+
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
@@ -168,6 +175,13 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}],
             ),
+            Node(
+                package="obstacle_detector",
+                executable="obstacle_extractor_node",
+                name="obstacle_extractor_node",
+                output="screen",
+                parameters=[obstacle_detector_params],
+            ),            
         ],
     )
     # LoadComposableNode for map server twice depending if we should use the

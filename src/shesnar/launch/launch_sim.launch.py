@@ -9,8 +9,59 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
+
 from launch_ros.actions import Node
 
+
+from launch import Action
+from launch.launch_context import LaunchContext
+from launch.some_substitutions_type import SomeSubstitutionsType
+from launch.utilities import normalize_to_list_of_substitutions
+import rclpy
+from rclpy.executors import SingleThreadedExecutor
+from rclpy.node import Node as rclpyNode
+import threading
+import time
+from typing import List
+
+
+class WaitForTopic(Action):
+    def __init__(
+        self,
+        topic_name: SomeSubstitutionsType,
+        timeout: float = 30.0,
+        node_name: str = 'topic_waiter_node'
+    ) -> None:
+        super().__init__()
+        self.__topic_name = normalize_to_list_of_substitutions(topic_name)
+        self.__timeout = timeout
+        self.__node_name = node_name
+
+def execute(self, context: LaunchContext) -> None:
+    # Perform all substitutions in the list and join them into a single string
+    topic_name = ''.join([context.perform_substitution(sub) for sub in self.__topic_name])
+    
+    rclpy.init()
+    node = rclpyNode(self.__node_name)
+
+    def wait_for_topic():
+        start = time.time()
+        while (time.time() - start) < self.__timeout:
+            topic_names_and_types = node.get_topic_names_and_types()
+            topic_names = [name for name, _ in topic_names_and_types]
+            if topic_name in topic_names:
+                node.get_logger().info(f"Detected topic '{topic_name}', continuing launch...")
+                rclpy.shutdown()
+                return
+            time.sleep(0.5)
+        node.get_logger().warn(f"Timeout waiting for topic '{topic_name}'")
+        rclpy.shutdown()
+
+    wait_thread = threading.Thread(target=wait_for_topic)
+    wait_thread.start()
+    wait_thread.join()
 
 
 def generate_launch_description():
@@ -59,9 +110,21 @@ def generate_launch_description():
     )
 
     delayed_ekf = TimerAction(
-    period=3.0,
-    actions=[ekf]
-)
+        period=5.0,
+        actions=[ekf]
+    )
+
+    wait_for_camera = WaitForTopic(topic_name='/camera_odom', timeout=20.0)
+
+    # ekf_after_camera = [
+    #     wait_for_camera,
+    #     ekf
+    # ]    
+
+    ekf_after_camera = [
+        wait_for_camera,
+        ekf
+    ]      
 
     default_world = os.path.join(
             get_package_share_directory(package_name),
@@ -141,7 +204,20 @@ def generate_launch_description():
                 # condition=IfCondition( is_localization ), 
                 launch_arguments={'map': map_file_path, 'use_sim_time': 'true', 'params_file': nav_params}.items()
     )
+
+    # start_localization = IncludeLaunchDescription(
+    #                         PythonLaunchDescriptionSource(
+    #                             PathJoinSubstitution(
+    #                                 [
+    #                                     FindPackageShare("lidar_localization"),
+    #                                     "launch",
+    #                                     "lidar_localization.launch.py",
+    #                                 ]
+    #                             )),
+    #                             launch_arguments={'map': map_file_path, 'use_sim_time': 'true'}.items()
+    #                             )
     
+    nav_params = os.path.join(get_package_share_directory(package_name),'config','nav2_params.yaml')
     start_navigation = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','navigation_launch.py'
@@ -149,17 +225,18 @@ def generate_launch_description():
                 # condition=IfCondition( is_navigation ), 
                 launch_arguments={'use_sim_time': 'true', 'map_subscribe_transient_local': 'true', 'params_file': nav_params}.items()
     )
-
-
-    start_route_controller = Node(
-        package="route_controller",
-        executable="driver",
-        arguments=[
-        ],
-        parameters = [{'use_sim_time': True}]
-    )    
-
     
+    drive_controller_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare("drive_controller"),
+                "launch",
+                "drive_controller.launch.py",
+            ])
+        ])  
+    )
+
+
     # Launch them all!
     return LaunchDescription([        
         world_arg,
@@ -174,9 +251,11 @@ def generate_launch_description():
         move_control,
         start_camera_node,
 
+        # delayed_ekf,
+        *ekf_after_camera,
+
         start_localization,
         start_navigation,
-        delayed_ekf
-        # ekf
-        # start_route_controller,
+
+        drive_controller_launch,
     ])
