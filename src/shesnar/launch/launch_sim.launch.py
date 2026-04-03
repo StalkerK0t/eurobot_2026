@@ -182,6 +182,14 @@ def generate_launch_description():
         parameters = [{'use_sim_time': True}]
     )
 
+    # start_camera_node = Node(
+    #     package="camera_cus_cpp",
+    #     executable="camera_node_cpp",
+    #     arguments=[
+    #     ],
+    #     parameters = [{'use_sim_time': True}]
+    # )
+
 
     # # to do map 
     # slam_params = os.path.join(get_package_share_directory(package_name),'config','mapper_params_online_async.yaml')
@@ -257,5 +265,5 @@ def generate_launch_description():
         start_localization,
         start_navigation,
 
-        drive_controller_launch,
+        # drive_controller_launch,
     ])
