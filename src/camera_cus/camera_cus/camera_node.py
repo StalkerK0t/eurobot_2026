@@ -104,9 +104,11 @@ class CusCamera(Node):
         # self.robot_marker = 1 # синий
         # self.robot_marker = 7 # желтый
         self.robot_marker = 69
+        
+        # дописать маркеры для жёлтой/синий команды ( list маркеров ) 
 
 
-    def transform(self, coordinates, z=0):
+    def transform(self, coordinates, z=0):  # передаём корды маркера
         # self.get_logger().info(f"Alpha: \n{alpha}")
         center = np.mean(coordinates, axis=0).astype(int)
         center = np.array([center[0], center[1], 1])
@@ -130,7 +132,7 @@ class CusCamera(Node):
         #     tvec, 
         #     self.marker_length/2
         # )
-        rotation_matrix, _ = cv2.Rodrigues(rvec)
+        rotation_matrix, _ = cv2.Rodrigues(rvec)        
         theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0])
 
         return pose[:2], theta
@@ -330,9 +332,12 @@ class CusCamera(Node):
         
         if self.is_calibrated:
             try:
-                markers = self.find_markers()
+                markers = self.find_markers() # 
                 # self.get_logger().info(f"Founded markres: {markers.keys()}")
-                pose, theta = self.transform(markers[self.robot_marker], 435)
+                pose, theta = self.transform(markers[self.robot_marker], 435)  # номер маркера, высота -5
+
+                # доступные маркеры + transform, учёт смещения на 5 см (отдельной ф-ей)
+
 
                 # Публикация трансформа (использовать если камера - единственный источник одометрии)
                 # self.send_tf(pose[0], pose[1], theta)
