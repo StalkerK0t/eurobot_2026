@@ -26,7 +26,7 @@
     <joint name="laser_joint" type="fixed">
         <parent link="body"/>
         <child link="laser_frame"/>
-        <origin xyz="0 0 0.41" rpy="0 0 -2.085"/>
+        <origin xyz="0 0 0.338" rpy="0 0 -1.57"/>
     </joint>
 
     <link name="laser_frame">
@@ -45,18 +45,74 @@
         </xacro:inertial_cylinder>
     </link>
 
-    <link name="aruco">
+    <link name="top_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-7.obj" scale="0.5 0.5 0.5"/>
             </geometry>
         </visual>
     </link>
 
     <joint name="aruco_joint" type="fixed">
         <parent link="laser_frame"/>
-        <child link="aruco"/>
-        <origin xyz="0 0 0.0225" rpy="1.571 0 2.085"/>
+        <child link="top_aruco"/>
+        <origin xyz="0 0 0.0935" rpy="1.571 0 1.57"/>
+    </joint>
+
+    <link name="right_aruco">
+        <visual>
+            <geometry>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-77.obj" scale="0.5 0.5 0.5"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="right_aruco_joint" type="fixed">
+        <parent link="top_aruco"/>
+        <child link="right_aruco"/>
+        <origin xyz="0 -0.0415 0.048" rpy="1.571 0 0"/>
+    </joint>
+
+    <link name="left_aruco">
+        <visual>
+            <geometry>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-78.obj" scale="0.5 0.5 0.5"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="left_aruco_joint" type="fixed">
+        <parent link="top_aruco"/>
+        <child link="left_aruco"/>
+        <origin xyz="0 -0.0415 -0.048" rpy="-1.571 0 0"/>
+    </joint>
+
+    <link name="back_aruco">
+        <visual>
+            <geometry>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-83.obj" scale="0.5 0.5 0.5"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="back_aruco_joint" type="fixed">
+        <parent link="top_aruco"/>
+        <child link="back_aruco"/>
+        <origin xyz="-0.048 -0.0415 0" rpy="0 0 1.571"/>
+    </joint>
+
+    <link name="forward_aruco">
+        <visual>
+            <geometry>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-88.obj" scale="0.5 0.5 0.5"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="forward_aruco_joint" type="fixed">
+        <parent link="top_aruco"/>
+        <child link="forward_aruco"/>
+        <origin xyz="0.048 -0.0415 0" rpy="0 0 -1.571"/>
     </joint>
 
     

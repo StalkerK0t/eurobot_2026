@@ -102,8 +102,8 @@ class CusCamera(Node):
         self.get_logger().info('Node started')
 
         # self.robot_marker = 1 # синий
-        # self.robot_marker = 7 # желтый
-        self.robot_marker = 69
+        self.robot_marker = 7 # желтый
+        # self.robot_marker = 69
         
         # дописать маркеры для жёлтой/синий команды ( list маркеров ) 
 

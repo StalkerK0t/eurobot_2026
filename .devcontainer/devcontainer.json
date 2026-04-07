@@ -7,13 +7,15 @@
     "--ipc=host",
 
     "--env=DISPLAY",
-     "--env=QT_X11_NO_MITSHM=1",
-     "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw",
-     "--device=/dev/dri:/dev/dri"
+    "--env=QT_X11_NO_MITSHM=1",
+    "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw",
+    "--device=/dev/dri:/dev/dri",
  
-
+    // Раскоментить тем, у кого видеокарта Nvidia
     // "--gpus=all",
-    // "-e NVIDIA_DRIVER_CAPABILITIES=all"
+    // "--env=NVIDIA_DRIVER_CAPABILITIES=all",
+    // "--env=__GLX_VENDOR_LIBRARY_NAME=nvidia",
+    // "--runtime=nvidia"
   ],
 
 

@@ -2,7 +2,7 @@
   <world name='empty'>
     <scene>
       <shadows>false</shadows>
-      <ambient>0.0 0.0 0.0 1</ambient>
+      <ambient>0.7 0.7 0.7 1</ambient>
       <background>0 0 0 1</background>
       <gamma_correction>false</gamma_correction>
     </scene>
@@ -10,7 +10,7 @@
     <physics name='1ms' type='ignored'>
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1.0</real_time_factor>
-      <real_time_update_rate>25</real_time_update_rate>
+      <real_time_update_rate>1000</real_time_update_rate>
     </physics>
     <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
     <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
@@ -1483,7 +1483,7 @@
 
 
   <light name='sun' type='directional'>
-      <pose>0 0 20 0 0 0</pose>
+      <pose>0 0 5 0 0 0</pose>
       <cast_shadows>true</cast_shadows>
       <intensity>1</intensity>
       <direction>0.0 0.0 -1.0</direction>
