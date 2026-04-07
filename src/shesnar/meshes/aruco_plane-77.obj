@@ -1,6 +1,6 @@
 # Blender 4.4.0
 # www.blender.org
-mtllib aruco_plane.mtl
+mtllib aruco_plane-77.mtl
 o Cube
 v -0.100000 -0.005000 0.100000
 v -0.100000 0.005000 0.100000

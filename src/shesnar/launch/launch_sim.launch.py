@@ -109,17 +109,8 @@ def generate_launch_description():
         parameters=[config_ekf],
     )
 
-    delayed_ekf = TimerAction(
-        period=5.0,
-        actions=[ekf]
-    )
 
     wait_for_camera = WaitForTopic(topic_name='/camera_odom', timeout=20.0)
-
-    # ekf_after_camera = [
-    #     wait_for_camera,
-    #     ekf
-    # ]    
 
     ekf_after_camera = [
         wait_for_camera,
@@ -251,11 +242,10 @@ def generate_launch_description():
         move_control,
         start_camera_node,
 
-        # delayed_ekf,
         *ekf_after_camera,
 
         start_localization,
         start_navigation,
 
-        drive_controller_launch,
+        # drive_controller_launch,
     ])
