@@ -111,13 +111,13 @@ class CusCamera(Node):
         self.side_marker_height = self.top_marker_height - 50
         self.side_marker_offsets = {    # x, y, theta
             # правый
-            77: np.array([0, -50, -math.pi / 2]),  
+            77: np.array([0, -48, -math.pi / 2]),  
             # левый
-            78: np.array([0, 50, math.pi / 2]),
+            78: np.array([0, 48, math.pi / 2]),
             # задний
-            83: np.array([-50, 0, math.pi]),
+            83: np.array([-48, 0, -math.pi]),
             # передний
-            88: np.array([50, 0, 0]),
+            88: np.array([48, 0, 0]),
         }
 
         # дописать маркеры для синей команды 
@@ -176,12 +176,16 @@ class CusCamera(Node):
             self.marker_length/2
         )
         rotation_matrix, _ = cv2.Rodrigues(rvec)        
-        theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0])
 
-        pose[0] += self.side_marker_offsets[current_marker][0] * math.cos(theta) + self.side_marker_offsets[current_marker][1] * math.sin(theta)
-        pose[1] += self.side_marker_offsets[current_marker][0] * math.sin(theta) + self.side_marker_offsets[current_marker][1] * math.cos(theta)
+        # theta =  np.arctan2(rotation_matrix[2,2], rotation_matrix[2,1]) -  #+ self.side_marker_offsets[current_marker][2]
+        theta = np.arctan2(rotation_matrix[2,0], rotation_matrix[0,0]) - self.side_marker_offsets[current_marker][2]
         
-        theta += self.side_marker_offsets[current_marker][2]
+
+
+        pose[1] += self.side_marker_offsets[current_marker][0] * math.cos(theta) - self.side_marker_offsets[current_marker][1] * math.sin(theta)
+        pose[0] += self.side_marker_offsets[current_marker][0] * math.sin(theta) + self.side_marker_offsets[current_marker][1] * math.cos(theta)
+        
+        # theta += self.side_marker_offsets[current_marker][2]
         pose[1] = 2000 - pose[1]
         pose /= 1000
 
