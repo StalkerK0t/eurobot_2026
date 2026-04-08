@@ -80,13 +80,14 @@ class CusCamera(Node):
             22: np.array([[550, 1350, 0], [650, 1350, 0], [650, 1450, 0], [550, 1450, 0]], dtype=np.float32),
             23: np.array([[2350, 1350, 0], [2450, 1350, 0], [2450, 1450, 0], [2350, 1450, 0]], dtype=np.float32)
         }
+
         objPoints = np.fromiter(Aruco.values(), dtype=object)
         ids = np.fromiter(Aruco.keys(), dtype=float)
         # print(objPoints, ids)
         dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         self.board = cv2.aruco.Board(objPoints, dictionary, ids)
 
-        self.marker_length = 80
+        self.marker_length = 80 # в будущем заменить на 70 
         self.object_corners = np.array([
             [[-self.marker_length//2,  self.marker_length//2, 0]],  # Левый верхний
             [[ self.marker_length//2,  self.marker_length//2, 0]],  # Правый верхний
@@ -103,9 +104,23 @@ class CusCamera(Node):
 
         # self.robot_marker = 1 # синий
         self.robot_marker = 7 # желтый
+        self.top_marker_height = 435
         # self.robot_marker = 69
         
-        # дописать маркеры для жёлтой/синий команды ( list маркеров ) 
+        self.side_markers = [77, 78, 83, 88] # желтый
+        self.side_marker_height = self.top_marker_height - 50
+        self.side_marker_offsets = {    # x, y, theta
+            # правый
+            77: np.array([0, -50, -math.pi / 2]),  
+            # левый
+            78: np.array([0, 50, math.pi / 2]),
+            # задний
+            83: np.array([-50, 0, math.pi]),
+            # передний
+            88: np.array([50, 0, 0]),
+        }
+
+        # дописать маркеры для синей команды 
 
 
     def transform(self, coordinates, z=0):  # передаём корды маркера
@@ -124,16 +139,51 @@ class CusCamera(Node):
         # print(object_corners.shape, corner_coord.shape)
 
         retval, rvec, tvec = cv2.solvePnP(self.object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
-        # cv2.drawFrameAxes(
-        #     self.image, 
-        #     self.camera_matrix, 
-        #     self.dist_coeffs, 
-        #     rvec, 
-        #     tvec, 
-        #     self.marker_length/2
-        # )
+        cv2.drawFrameAxes(
+            self.image, 
+            self.camera_matrix, 
+            self.dist_coeffs, 
+            rvec, 
+            tvec, 
+            self.marker_length/2
+        )
+        rotation_matrix, _ = cv2.Rodrigues(rvec)        
+        theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0]) # исправить наоборот?
+
+        return pose[:2], theta
+
+    def side_transform(self, current_marker, coordinates):  # передаём ID, координаты маркера
+        # self.get_logger().info(f"Alpha: \n{alpha}")
+        center = np.mean(coordinates, axis=0).astype(int)
+        center = np.array([center[0], center[1], 1])
+        
+        alpha = (-self.side_marker_height + self.r[-1,:] @ self.t)/(self.r[-1,:] @ center)
+
+        pose = self.r @ (alpha * center - self.t)
+
+
+        coordinates = np.array(coordinates, dtype=np.float32)
+        coordinates = coordinates.reshape(4, 1, 2)
+        # print(object_corners.shape, corner_coord.shape)
+
+        retval, rvec, tvec = cv2.solvePnP(self.object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        cv2.drawFrameAxes(
+            self.image, 
+            self.camera_matrix, 
+            self.dist_coeffs, 
+            rvec, 
+            tvec, 
+            self.marker_length/2
+        )
         rotation_matrix, _ = cv2.Rodrigues(rvec)        
         theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0])
+
+        pose[0] += self.side_marker_offsets[current_marker][0] * math.cos(theta) + self.side_marker_offsets[current_marker][1] * math.sin(theta)
+        pose[1] += self.side_marker_offsets[current_marker][0] * math.sin(theta) + self.side_marker_offsets[current_marker][1] * math.cos(theta)
+        
+        theta += self.side_marker_offsets[current_marker][2]
+        pose[1] = 2000 - pose[1]
+        pose /= 1000
 
         return pose[:2], theta
 
@@ -199,7 +249,7 @@ class CusCamera(Node):
 
     def set_default(self):
         markers = self.find_markers()
-        pose, theta = self.transform(markers[self.robot_marker], 435)
+        pose, theta = self.transform(markers[self.robot_marker], self.top_marker_height)
         # self.default_theta = 3.874187464676028
         self.default_theta = theta
         self.get_logger().info(f"Default theta: {self.default_theta}")
@@ -334,14 +384,25 @@ class CusCamera(Node):
             try:
                 markers = self.find_markers() # 
                 # self.get_logger().info(f"Founded markres: {markers.keys()}")
-                pose, theta = self.transform(markers[self.robot_marker], 435)  # номер маркера, высота -5
+                
+                pose, theta = self.transform(markers[self.robot_marker], self.top_marker_height)  # номер маркера, высота -5
+                position_info_string = "Robot pose from side markers: "
+                position_info_string += f"ID{self.robot_marker}: x={pose[0]:.3f}, y={pose[1]:.3f}, theta={theta:.3f}; "
+
+                side_m_poses = []
+                for current_marker in self.side_markers:
+                    if current_marker in markers:
+                        current_marker_pose, current_marker_theta = self.side_transform(current_marker, markers[current_marker])
+                        side_m_poses.append([current_marker_pose, current_marker_theta])
+                        position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.3f}; "
 
                 # доступные маркеры + transform, учёт смещения на 5 см (отдельной ф-ей)
 
 
                 # Публикация трансформа (использовать если камера - единственный источник одометрии)
                 # self.send_tf(pose[0], pose[1], theta)
-
+                
+                self.get_logger().info(position_info_string)
                 self.send_odometry(pose[0], pose[1], theta)
             except Exception as e:
                 self.get_logger().warning(f"Error finding: {e}")
