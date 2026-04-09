@@ -103,8 +103,8 @@ class CusCamera(Node):
         self.get_logger().info('Node started')
 
         # физические параметры робота
-        self.max_linear_velocity = 0.07     # м / сек
-        self.max_angular_velocity = 0.02    # радиана / сек
+        self.max_linear_velocity = 0.3     # м / сек
+        self.max_angular_velocity = 0.5    # радиана / сек
         self.top_marker_height = 435        # мм
         self.side_marker_height = self.top_marker_height - 50
 
@@ -425,10 +425,14 @@ class CusCamera(Node):
         # проверка
         if linear_velocity > self.max_linear_velocity:
             self.get_logger().warn(f"Rejected pose: linear vel {linear_velocity:.3f}")
+            self.get_logger().warn(f"Dt = {dt:.3f}, distance = {distance:.3f}")
+
             return None, None
 
         if angular_velocity > self.max_angular_velocity:
             self.get_logger().warn(f"Rejected pose: angular vel {angular_velocity:.3f}")
+            self.get_logger().warn(f"Dt = {dt:.3f}, dtheta = {dtheta:.3f}")
+
             return None, None
 
         return pose, theta
@@ -473,25 +477,27 @@ class CusCamera(Node):
                 # обработка верхнего маркера
                 if self.robot_marker in markers:
                     top_marker_pose, top_marker_theta = self.transform(markers[self.robot_marker], self.top_marker_height)
-                    position_info_string += f"ID{self.robot_marker}: x={top_marker_pose[0]:.3f}, y={top_marker_pose[1]:.3f}, theta={top_marker_theta:.3f}; "
+                    position_info_string += f"ID{self.robot_marker}: x={top_marker_pose[0]:.3f}, y={top_marker_pose[1]:.3f}, theta={top_marker_theta:.6f}; "
 
                     # проверка корректности позы
                     top_marker_pose, top_marker_theta = self.verify_pose(top_marker_pose, top_marker_theta)
                     if (top_marker_pose is not None) and (top_marker_theta is not None):
                         all_poses.append([top_marker_pose, top_marker_theta])
-                    
+                    else:
+                        self.get_logger().warn(f"Rejected top marker")
 
                 # обработка боковых маркеров
                 for current_marker in self.side_markers:
                     if current_marker in markers:
                         current_marker_pose, current_marker_theta = self.side_transform(current_marker, markers[current_marker])
-                        position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.3f}; "
+                        position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.6f}; "
 
                         # проверка корректности позы
                         current_marker_pose, current_marker_theta = self.verify_pose(current_marker_pose, current_marker_theta)
                         if (current_marker_pose is not None) and (current_marker_theta is not None):
                             all_poses.append([current_marker_pose, current_marker_theta])
-                
+                        else:
+                            self.get_logger().warn(f"Rejected marker {current_marker}")
                 if len(all_poses) == 0:
                     self.get_logger().warning(f"No markers found!!!")
                     
