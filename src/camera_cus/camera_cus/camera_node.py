@@ -262,10 +262,44 @@ class CusCamera(Node):
     def set_default(self):
         markers = self.find_markers()
         pose, theta = self.transform(markers[self.robot_marker], self.top_marker_height)
+
+        # all_poses = []
+        # position_info_string = "Robot visual start pose: "
+
+        # # обработка верхнего маркера
+        # if self.robot_marker in markers:
+        #     top_marker_pose, top_marker_theta = self.transform(markers[self.robot_marker], self.top_marker_height)
+        #     position_info_string += f"ID{self.robot_marker}: x={top_marker_pose[0]:.3f}, y={top_marker_pose[1]:.3f}, theta={top_marker_theta:.3f}; "
+        #     all_poses.append([top_marker_pose, top_marker_theta])     
+
+        # # обработка боковых маркеров
+        # for current_marker in self.side_markers:
+        #     if current_marker in markers:
+        #         current_marker_pose, current_marker_theta = self.side_transform(current_marker, markers[current_marker])
+        #         position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.3f}; "
+        #         all_poses.append([current_marker_pose, current_marker_theta])
+        
+        # if len(all_poses) == 0:
+        #     self.get_logger().warning(f"No markers found!!!")
+        # else:
+        #     self.get_logger().info(position_info_string)
+
+        #     # объединение позиций
+        #     pose_x = np.mean([p[0][0] for p in all_poses])
+        #     pose_y = np.mean([p[0][1] for p in all_poses])
+
+        #     # объединение углов
+        #     sin_sum = np.mean([math.sin(p[1]) for p in all_poses])
+        #     cos_sum = np.mean([math.cos(p[1]) for p in all_poses])
+        #     theta = math.atan2(sin_sum, cos_sum)
+
+
+
         # self.default_theta = 3.874187464676028
         self.default_theta = theta
         self.get_logger().info(f"Default theta: {self.default_theta}")
         self.last_x, self.last_y, self.last_theta = pose[1], -pose[0], 0
+        # self.last_x, self.last_y, self.last_theta = pose_y, -pose_x, 0 # многомаркерная первичная локализация
         self.get_logger().info(f"Start odometry: {self.last_x, self.last_y, self.last_theta}")
         self.last_time = self.get_clock().now().nanoseconds
         self.last_time_w = self.last_time
@@ -338,7 +372,7 @@ class CusCamera(Node):
         odom.pose.pose.orientation.w = q[3]
         
         self.get_logger().info(f"Odometry: {y:.5f} {-x:.5f} {np.degrees(theta):.5f} {vel_w:.5f}")
-        # self.get_logger().info(f"Velosity: {vel_x, vel_y, vel_w}")
+        
         # set the velocity
         odom.child_frame_id = 'base_link'
         odom.twist.twist.linear.x = vel_x
@@ -362,6 +396,43 @@ class CusCamera(Node):
 
     def timer_callback(self):
         self.send_odometry(1.0, 1.0, 0)
+
+    
+    def verify_pose(self, pose, theta):
+        # текущее время
+        dt = (self.current_time - self.last_time) / 1e9
+
+        if dt <= 0:
+            return None, None
+
+        # перевод в ту же систему координат, что и odometry
+        new_x = pose[1]
+        new_y = -pose[0]
+
+        # разница
+        dx = new_x - self.last_x
+        dy = new_y - self.last_y
+
+        # линейная скорость
+        distance = math.sqrt(dx**2 + dy**2)
+        linear_velocity = distance / dt
+
+        # угловая скорость
+        dtheta = theta - self.last_theta
+        dtheta = (dtheta + math.pi) % (2 * math.pi) - math.pi
+        angular_velocity = abs(dtheta) / dt
+
+        # проверка
+        if linear_velocity > self.max_linear_velocity:
+            self.get_logger().warn(f"Rejected pose: linear vel {linear_velocity:.3f}")
+            return None, None
+
+        if angular_velocity > self.max_angular_velocity:
+            self.get_logger().warn(f"Rejected pose: angular vel {angular_velocity:.3f}")
+            return None, None
+
+        return pose, theta
+            
 
     def callback(self, msg):
         try:
@@ -402,16 +473,24 @@ class CusCamera(Node):
                 # обработка верхнего маркера
                 if self.robot_marker in markers:
                     top_marker_pose, top_marker_theta = self.transform(markers[self.robot_marker], self.top_marker_height)
-                    all_poses.append([top_marker_pose, top_marker_theta])
                     position_info_string += f"ID{self.robot_marker}: x={top_marker_pose[0]:.3f}, y={top_marker_pose[1]:.3f}, theta={top_marker_theta:.3f}; "
+
+                    # проверка корректности позы
+                    top_marker_pose, top_marker_theta = self.verify_pose(top_marker_pose, top_marker_theta)
+                    if (top_marker_pose is not None) and (top_marker_theta is not None):
+                        all_poses.append([top_marker_pose, top_marker_theta])
+                    
 
                 # обработка боковых маркеров
                 for current_marker in self.side_markers:
                     if current_marker in markers:
                         current_marker_pose, current_marker_theta = self.side_transform(current_marker, markers[current_marker])
-                        all_poses.append([current_marker_pose, current_marker_theta])
                         position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.3f}; "
 
+                        # проверка корректности позы
+                        current_marker_pose, current_marker_theta = self.verify_pose(current_marker_pose, current_marker_theta)
+                        if (current_marker_pose is not None) and (current_marker_theta is not None):
+                            all_poses.append([current_marker_pose, current_marker_theta])
                 
                 if len(all_poses) == 0:
                     self.get_logger().warning(f"No markers found!!!")
