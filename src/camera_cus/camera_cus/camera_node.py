@@ -102,13 +102,18 @@ class CusCamera(Node):
         self.last_time_w = 0
         self.get_logger().info('Node started')
 
-        # self.robot_marker = 1 # синий
-        self.robot_marker = 7 # желтый
-        self.top_marker_height = 435
-        # self.robot_marker = 69
-        
-        self.side_markers = [77, 78, 83, 88] # желтый
+        # физические параметры робота
+        self.max_linear_velocity = 0.07     # м / сек
+        self.max_angular_velocity = 0.02    # радиана / сек
+        self.top_marker_height = 435        # мм
         self.side_marker_height = self.top_marker_height - 50
+
+
+        # self.robot_marker = 1                 # синий
+        # дописать боковые маркеры для синей команды 
+
+        self.robot_marker = 7                   # желтый
+        self.side_markers = [77, 78, 83, 88]    # желтый
         self.side_marker_offsets = {    # x, y, theta
             # правый
             77: np.array([0, -48, -math.pi / 2]),  
@@ -120,7 +125,6 @@ class CusCamera(Node):
             88: np.array([48, 0, 0]),
         }
 
-        # дописать маркеры для синей команды 
 
 
     def transform(self, coordinates, z=0):  # передаём корды маркера
@@ -180,6 +184,10 @@ class CusCamera(Node):
         # theta =  np.arctan2(rotation_matrix[2,2], rotation_matrix[2,1]) -  #+ self.side_marker_offsets[current_marker][2]
         theta = np.arctan2(rotation_matrix[2,0], rotation_matrix[0,0]) - self.side_marker_offsets[current_marker][2]
         
+        if theta > math.pi:
+            theta -= 2 * math.pi
+        elif theta < -math.pi:
+            theta += 2 * math.pi
 
 
         pose[1] += self.side_marker_offsets[current_marker][0] * math.cos(theta) - self.side_marker_offsets[current_marker][1] * math.sin(theta)
@@ -386,30 +394,50 @@ class CusCamera(Node):
         
         if self.is_calibrated:
             try:
-                markers = self.find_markers() # 
-                # self.get_logger().info(f"Founded markres: {markers.keys()}")
+                markers = self.find_markers() 
                 
-                pose, theta = self.transform(markers[self.robot_marker], self.top_marker_height)  # номер маркера, высота -5
+                all_poses = []
                 position_info_string = "Robot pose from side markers: "
-                position_info_string += f"ID{self.robot_marker}: x={pose[0]:.3f}, y={pose[1]:.3f}, theta={theta:.3f}; "
 
-                side_m_poses = []
+                # обработка верхнего маркера
+                if self.robot_marker in markers:
+                    top_marker_pose, top_marker_theta = self.transform(markers[self.robot_marker], self.top_marker_height)
+                    all_poses.append([top_marker_pose, top_marker_theta])
+                    position_info_string += f"ID{self.robot_marker}: x={top_marker_pose[0]:.3f}, y={top_marker_pose[1]:.3f}, theta={top_marker_theta:.3f}; "
+
+                # обработка боковых маркеров
                 for current_marker in self.side_markers:
                     if current_marker in markers:
                         current_marker_pose, current_marker_theta = self.side_transform(current_marker, markers[current_marker])
-                        side_m_poses.append([current_marker_pose, current_marker_theta])
+                        all_poses.append([current_marker_pose, current_marker_theta])
                         position_info_string += f"ID{current_marker}: x={current_marker_pose[0]:.3f}, y={current_marker_pose[1]:.3f}, theta={current_marker_theta:.3f}; "
 
-                # доступные маркеры + transform, учёт смещения на 5 см (отдельной ф-ей)
-
-
-                # Публикация трансформа (использовать если камера - единственный источник одометрии)
-                # self.send_tf(pose[0], pose[1], theta)
                 
-                self.get_logger().info(position_info_string)
-                self.send_odometry(pose[0], pose[1], theta)
+                if len(all_poses) == 0:
+                    self.get_logger().warning(f"No markers found!!!")
+                    
+                else:
+                    self.get_logger().info(position_info_string)
+
+                    # объединение позиций
+                    pose_x = np.mean([p[0][0] for p in all_poses])
+                    pose_y = np.mean([p[0][1] for p in all_poses])
+
+                    # объединение углов
+                    sin_sum = np.mean([math.sin(p[1]) for p in all_poses])
+                    cos_sum = np.mean([math.cos(p[1]) for p in all_poses])
+                    theta = math.atan2(sin_sum, cos_sum)
+
+                    # Публикация трансформа (использовать если камера - единственный источник одометрии)
+                    # self.send_tf(pose[0], pose[1], theta)        
+
+                    self.get_logger().info(f"Average pose: x={pose_x:.3f}, y={pose_y:.3f}, theta={theta:.3f}")
+                    self.send_odometry(pose_x, pose_y, theta)
+
             except Exception as e:
                 self.get_logger().warning(f"Error finding: {e}")
+        
+        
         else:
             try:
                 self.calibrate()
