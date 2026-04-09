@@ -3,8 +3,8 @@ ekf_filter_node:
     use_sim_time: true
     # reset_on_time_jump: true
 
-    frequency: 20.0
-    sensor_timeout: 0.2
+    frequency: 60.0
+    # sensor_timeout: 1.2
 
     two_d_mode: true
     publish_tf: true
@@ -23,9 +23,8 @@ ekf_filter_node:
                    false, false, false]
 
     odom0_differential: false  
-    # odom0_relative: true       
     odom0_relative: false     
-    odom0_queue_size: 2
+    odom0_queue_size: 5
 
     # Визуальная одометрия (одомтерия относительно СК map)
     odom1: /camera_odom
@@ -53,7 +52,7 @@ ekf_filter_node:
     # pose1_mahalanobis_threshold: 0.2
 
 
-    print_diagnostics: true
+    print_diagnostics: false
     debug: false
 
     initial_state: [1.0, -0.3, 0.111,   # x, y, z
