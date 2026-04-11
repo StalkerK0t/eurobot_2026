@@ -74,8 +74,11 @@ class BasicNavigator(Node):
                 'x': raw_coords[idx],
                 'y': raw_coords[idx+1],
                 'yaw': raw_coords[idx+2],
+                'gripper': raw_coords[idx+3],
                 'kz': raw_zones[i],   # имя keepout zone, которую надо отключить после достижения точки; если не надо ничего отключать = None
-            })    
+            })  
+
+        self.gripper = 0 # start  
 
         self.time_until_end = self.get_parameter("time_until_end").get_parameter_value().integer_value             
 
@@ -114,6 +117,10 @@ class BasicNavigator(Node):
                                                       10)
         self.obstacle_pub = self.create_publisher(String, '/keepout_zone', 10)
 
+        self.gripper_pub = self.create_publisher(PoseWithCovarianceStamped,
+                                                      '/grippers',
+                                                      10)
+
         self.waitUntilNav2Active()  
         self.create_timer(1, self.timer_callback)
 
@@ -125,6 +132,8 @@ class BasicNavigator(Node):
     def set_goal_pose(self, waypoint_index : int = 0):        
         yaw = self.points[waypoint_index]['yaw']
         quaternion = quaternion_from_euler(0, 0, yaw)
+
+        self.gripper = self.points[waypoint_index]['gripper']
 
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
@@ -203,7 +212,11 @@ class BasicNavigator(Node):
         self.get_logger().info("Call_result_callback")
         self.navigation_in_progress = False
 
-        if self.isNavComplete():            
+        if self.isNavComplete():
+
+            # send self.gripper
+            self.gripper_pub.publish(self.gripper)
+                        
             self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
             self.current_point += 1
 

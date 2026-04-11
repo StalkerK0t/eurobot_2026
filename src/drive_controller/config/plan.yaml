@@ -1,9 +1,10 @@
 drive_controller:
   ros__parameters:
     points:
-      - [0.529, 0.045, 0.001,   # x,y,yaw; орехи 1
-         0.859, 0.003, 0.001,   # x,y,yaw; зона выгрузки 1
-         1.765, 0.003, 0.001,]  # x,y,yaw; гнездо
+      - [0.529, 0.045, 0.001, command,   # x,y,yaw, gripper; орехи 1
+         0.859, 0.003, 0.001, command,  # x,y,yaw; зона выгрузки 1
+         1.765, 0.003, 0.001, command]  # x,y,yaw; гнездо
     point_zones: 
       - ["None", "C", "None"]           # keepout_zone
+    
     time_until_end: 95
