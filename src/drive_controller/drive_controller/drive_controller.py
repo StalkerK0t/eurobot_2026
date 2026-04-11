@@ -74,11 +74,13 @@ class BasicNavigator(Node):
                 'x': raw_coords[idx],
                 'y': raw_coords[idx+1],
                 'yaw': raw_coords[idx+2],
-                'gripper': raw_coords[idx+3],
+                'gripper1': raw_coords[idx+3],
+                'gripper2': raw_coords[idx+3],
                 'kz': raw_zones[i],   # имя keepout zone, которую надо отключить после достижения точки; если не надо ничего отключать = None
             })  
 
-        self.gripper = 0 # start  
+        self.gripper1 = 0 # command 1
+        self.gripper2 = 0 # command 2
 
         self.time_until_end = self.get_parameter("time_until_end").get_parameter_value().integer_value             
 
@@ -117,9 +119,13 @@ class BasicNavigator(Node):
                                                       10)
         self.obstacle_pub = self.create_publisher(String, '/keepout_zone', 10)
 
-        self.gripper_pub = self.create_publisher(PoseWithCovarianceStamped,
-                                                      '/grippers',
-                                                      10)
+        self.gripper_pub = self.create_publisher(String,
+                                                 '/grippers',
+                                                 10)
+
+        self.gripper_sub = self.create_subscription(String,
+                                                 '/grippers_rx',
+                                                 10)
 
         self.waitUntilNav2Active()  
         self.create_timer(1, self.timer_callback)
@@ -133,7 +139,8 @@ class BasicNavigator(Node):
         yaw = self.points[waypoint_index]['yaw']
         quaternion = quaternion_from_euler(0, 0, yaw)
 
-        self.gripper = self.points[waypoint_index]['gripper']
+        self.gripper1 = self.points[waypoint_index]['gripper1']
+        self.gripper2 = self.points[waypoint_index]['gripper2']
 
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
@@ -215,7 +222,11 @@ class BasicNavigator(Node):
         if self.isNavComplete():
 
             # send self.gripper
-            self.gripper_pub.publish(self.gripper)
+            self.gripper_pub.publish(self.gripper1)
+
+            gripper_sub
+
+            self.gripper_pub.publish(self.gripper2)
                         
             self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
             self.current_point += 1
