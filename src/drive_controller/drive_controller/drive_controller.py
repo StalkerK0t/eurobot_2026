@@ -120,11 +120,12 @@ class BasicNavigator(Node):
         self.obstacle_pub = self.create_publisher(String, '/keepout_zone', 10)
 
         self.gripper_pub = self.create_publisher(String,
-                                                 '/grippers',
+                                                 '/grippers',                                                 
                                                  10)
 
         self.gripper_sub = self.create_subscription(String,
                                                  '/grippers_rx',
+                                                 self.gripper_callback,
                                                  10)
 
         self.waitUntilNav2Active()  
@@ -215,18 +216,16 @@ class BasicNavigator(Node):
         self.result_future = goal_handle.get_result_async()
         self.result_future.add_done_callback(self.get_result_callback)
     
+    def gripper_callback(self, gripper_answer): 
+        if gripper_answer
+        self.gripper_pub.publish(self.gripper2)
+
     def get_result_callback(self, future):
         self.get_logger().info("Call_result_callback")
         self.navigation_in_progress = False
 
         if self.isNavComplete():
-
-            # send self.gripper
-            self.gripper_pub.publish(self.gripper1)
-
-            gripper_sub
-
-            self.gripper_pub.publish(self.gripper2)
+            self.gripper_pub.publish(self.gripper1)            
                         
             self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
             self.current_point += 1
