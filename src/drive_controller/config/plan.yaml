@@ -1,39 +1,18 @@
 drive_controller:
   ros__parameters:
     points:
-      - x: 0.529
-        y: 0.045
-        yaw: 0.001
-        gripper_cmd: "build"      # Must match C++ node commands
-        gripper_cmd2: ""
-        keepout_zone: null        # or "C", "zone_name"
-        
-      - x: 0.859
-        y: 0.003
-        yaw: 0.001
-        gripper_cmd: "compile"
-        gripper_cmd2: ""
-        keepout_zone: "C"
-        
-      - x: 1.765
-        y: 0.003
-        yaw: 0.001
-        gripper_cmd: "start_state"
-        gripper_cmd2: ""
-        keepout_zone: null
+      - [1.1211, -0.34499, 1.5210959,   # x,y,yaw; орехи 1
+         0.859, -0.340065, 1.5210959,   # x,y,yaw; зона выгрузки 1
+         1.765, 0.003, 0.001,]  # x,y,yaw; гнездо
+    point_zones: 
+      - ["None", "C", "None"]           # keepout_zone
+    gripper_cmds: 
+      - ["catch", "perevorot1", "start_state"]
+    gripper_cmds2: 
+      - ["up", "release", ""]
     
-    # Optional: default serial config override
     gripper_serial:
       device: "/dev/ttyAMA2"
       baudrate: 115200
     
-    time_until_end: 95  # seconds
-
-    # points:
-    #   - [0.529, 0.045, 0.001, 1, command,   # x,y,yaw, gripper; орехи 1
-    #      0.859, 0.003, 0.001, 2, command,  # x,y,yaw; зона выгрузки 1
-    #      1.765, 0.003, 0.001, 3, command]  # x,y,yaw; гнездо
-    # point_zones: 
-    #   - ["None", "C", "None"]           # keepout_zone
-    
-    # time_until_end: 95
+    time_until_end: 95

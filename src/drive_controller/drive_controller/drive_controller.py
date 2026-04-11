@@ -53,66 +53,39 @@ class BasicNavigator(Node):
         self.declare_parameter('gripper_serial.device', '/dev/ttyUSB0')
         self.declare_parameter('gripper_serial.baudrate', 115200)
 
+        self.declare_parameter('points', [0.0])    # последовательность точек загрузки/разгрузки   
+        self.declare_parameter('point_zones', [''])  # последовательность отключаемых зон (None, если ничего не отключаем)
+        self.declare_parameter('gripper_cmds', [''])  # последовательность отключаемых зон (None, если ничего не отключаем)
+        self.declare_parameter('gripper_cmds2', [''])  # последовательность отключаемых зон (None, если ничего не отключаем)
+
         # # Read params from YAML
-        # raw_coords = self.get_parameter("points").get_parameter_value().double_array_value
-        # raw_zones = self.get_parameter("gripper_serial").get_parameter_value().string_array_value
+        raw_coords = self.get_parameter("points").get_parameter_value().double_array_value
+        raw_zones = self.get_parameter("point_zones").get_parameter_value().string_array_value
+        gripper_cmds1 = self.get_parameter("gripper_cmds").get_parameter_value().string_array_value
+        gripper_cmds2 = self.get_parameter("gripper_cmds2").get_parameter_value().string_array_value
+        self.time_until_end = self.get_parameter("time_until_end").get_parameter_value().integer_value             
 
-        # # Validate length
-        # if len(raw_coords) % 3 != 0:
-        #     raise ValueError("point_coords must be divisible by 3 (x, y, yaw per point)")
+        # Validate length
+        if len(raw_coords) % 3 != 0:
+            raise ValueError("point_coords must be divisible by 3 (x, y, yaw per point)")
 
-        # num_points = len(raw_coords) // 3
-        # if len(raw_zones) != num_points:
-        #     raise ValueError("point_zones length must match number of points")        
-
-      #  self.get_logger().info(f"START NAVIGATOR {raw_points}, {len(raw_points)}")
-
-        # self.points = []
-        # for i in range(num_points):
-        #     idx = i * 3
-        #     self.points.append({
-        #         'x': raw_coords[idx],
-        #         'y': raw_coords[idx+1],
-        #         'yaw': raw_coords[idx+2],
-        #         'gripper1': 
-        #         'gripper2': ,
-        #         'kz': raw_zones[i],   # имя keepout zone, которую надо отключить после достижения точки; если не надо ничего отключать = None
-        #     })  
+        num_points = len(raw_coords) // 3
+        if len(raw_zones) != num_points:
+            raise ValueError("point_zones length must match number of points")        
 
         self.points = []
-        i = 0
-        while True:
-            try:
-                # Try to read the first field to detect if point i exists
-                prefix = f'points.{i}'
-                x = self.get_parameter(f'{prefix}.x').value
-                y = self.get_parameter(f'{prefix}.y').value
-                yaw = self.get_parameter(f'{prefix}.yaw').value
-                gripper_cmd = self.get_parameter(f'{prefix}.gripper_cmd').value
-                gripper_cmd2 = self.get_parameter(f'{prefix}.gripper_cmd2').value
-                keepout_zone_param = self.get_parameter(f'{prefix}.keepout_zone')
-                
-                # Handle null/None for keepout_zone (ROS represents YAML null as None or empty string)
-                kz = keepout_zone_param.value if keepout_zone_param.value != '' else None
-                
-                self.points.append({
-                    'x': x,
-                    'y': y,
-                    'yaw': yaw,
-                    'gripper1': gripper_cmd,
-                    'gripper2': gripper_cmd2,
-                    'kz': kz,
-                })
-                i += 1
-            except ParameterNotDeclaredException:
-                # No more points
-                break
+        for i in range(num_points):
+            idx = i * 3
+            self.points.append({
+                'x': raw_coords[idx],
+                'y': raw_coords[idx+1],
+                'yaw': raw_coords[idx+2],
+                'kz': raw_zones[i],   # имя keepout zone, которую надо отключить после достижения точки; если не надо ничего отключать = None
+                'gripper1': gripper_cmds1[i],
+                'gripper2': gripper_cmds2[i],
+            })   
 
-        if not self.points:
-            self.get_logger().warn("No points found in config!")
-
-        self.time_until_end = self.get_parameter('time_until_end').value
-
+ 
         self.gripper1 = "deploy" # command 1
         self.gripper2 = "deploy" # command 2
 
