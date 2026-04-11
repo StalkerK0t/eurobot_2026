@@ -236,13 +236,16 @@ class BasicNavigator(Node):
         self.get_logger().info("Call_result_callback")
         self.navigation_in_progress = False
 
-        if self.isNavComplete():
-            msg = String()
-            msg.data = self.gripper1
-            self.gripper_pub.publish(msg)            
-                        
-            self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
-            self.current_point += 1
+        result = future.result().result
+        self.get_logger().info(f"Navigation completed with status: {result.status}")
+
+        # if self.isNavComplete():
+        msg = String()
+        msg.data = self.gripper1
+        self.gripper_pub.publish(msg)            
+                    
+        self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
+        self.current_point += 1
 
         if len(self.points) == self.current_point:
             self.get_logger().info("All goals complite")
@@ -287,22 +290,22 @@ class BasicNavigator(Node):
         self.debug('Goal succeeded!')
         return True
 
-    def isNavComplete(self):
-        if not self.result_future:
-            # task was cancelled or completed
-            return True
-        rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
-        if self.result_future.result():
-            self.status = self.result_future.result().status
-            if self.status != GoalStatus.STATUS_SUCCEEDED:
-                self.debug('Goal with failed with status code: {0}'.format(self.status))
-                return True
-        else:
-            # Timed out, still processing, not complete yet
-            return False
+    # def isNavComplete(self):
+    #     if not self.result_future:
+    #         # task was cancelled or completed
+    #         return True
+    #     rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
+    #     if self.result_future.result():
+    #         self.status = self.result_future.result().status
+    #         if self.status != GoalStatus.STATUS_SUCCEEDED:
+    #             self.debug('Goal with failed with status code: {0}'.format(self.status))
+    #             return True
+    #     else:
+    #         # Timed out, still processing, not complete yet
+    #         return False
 
-        self.debug('Goal succeeded!')
-        return True
+    #     self.debug('Goal succeeded!')
+    #     return True
 
     def getFeedback(self):
         return self.feedback
