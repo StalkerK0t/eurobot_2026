@@ -89,6 +89,8 @@ class BasicNavigator(Node):
         self.gripper1 = "deploy" # command 1
         self.gripper2 = "deploy" # command 2
 
+        self.gripper_send = False
+
         self.time_until_end = self.get_parameter("time_until_end").get_parameter_value().integer_value             
 
         self.initial_pose = PoseStamped()
@@ -99,6 +101,7 @@ class BasicNavigator(Node):
         self.status = None
 
         self.start_timer = time.time()      # TEMP!
+        # self.start_timer = None
 
         self.navigation_in_progress = False # True means that robot is going to point
         # self.elevator_in_progress = False # True means that robot work with elevator        
@@ -135,17 +138,26 @@ class BasicNavigator(Node):
                                                  self.gripper_callback,
                                                  10)
 
+        self.start_sub = self.create_subscription(String,
+                                                 '/start',
+                                                 self.start_callback,
+                                                 10)
+
         self.waitUntilNav2Active()  
         self.create_timer(1, self.timer_callback)
 
-        msg = String()
-        msg.data = "deploy"
-        self.gripper_pub.publish(msg)
 
     def setInitialPose(self, initial_pose):
         self.initial_pose_received = False
         self.initial_pose = initial_pose
         self._setInitialPose()
+
+    def start_callback(self, answer):
+        self.start_timer = time.time()
+
+        msg = String()
+        msg.data = "deploy"
+        self.gripper_pub.publish(msg)
 
     def set_goal_pose(self, waypoint_index : int = 0):        
         yaw = self.points[waypoint_index]['yaw']
@@ -195,6 +207,7 @@ class BasicNavigator(Node):
 
     def go_to_pose(self, pose):
         self.navigation_in_progress = True
+        self.gripper_send = False
 
         # Sends a `NavToPose` action request
         self.debug("Waiting for 'NavigateToPose' action server")
@@ -234,27 +247,38 @@ class BasicNavigator(Node):
 
     def get_result_callback(self, future):
         self.get_logger().info("Call_result_callback")
-        self.navigation_in_progress = False
 
-        result = future.result().result
-        self.get_logger().info(f"Navigation completed with status: {result.status}")
+        result = future.result()  # This is NavigateToPose.Result
 
-        # if self.isNavComplete():
-        msg = String()
-        msg.data = self.gripper1
-        self.gripper_pub.publish(msg)            
+        if result is None:
+            self.get_logger().error("Navigation result is None")
+            self.navigation_in_progress = False
+            return
+
+        # Check the action status
+        if result.status == GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().info(f"✅ Goal REACHED! Point {self.current_point}")
+
+            msg = String()
+            msg.data = self.gripper1
+            self.gripper_pub.publish(msg)  
+
+            self.gripper_send = True  
+        
+        elif result.status == GoalStatus.STATUS_CANCELED:
+            self.get_logger().warn("⚠️ Navigation was CANCELED")
+                        
+        elif result.status == GoalStatus.STATUS_ABORTED:
+            self.get_logger().error(f"❌ Navigation ABORTED: {result.result}")
+            # Optional: skip to next point or retry            
+        else:
+            self.get_logger().warn(f"Unknown status: {result.status}")
                     
-        self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
+        # self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
         self.current_point += 1
 
         if len(self.points) == self.current_point:
-            self.get_logger().info("All goals complite")
-
-            # self.screen_sum += self.term_order[len(self.term_order) - 1]
-            # self.current_term = len(self.term_order)
-            # msg = Int16()
-            # msg.data = self.screen_sum
-            # self.screen_pub.publish(msg)        
+            self.get_logger().info("All goals complite")    
 
     def update_obstacle(self, obstacle_name):
         """
