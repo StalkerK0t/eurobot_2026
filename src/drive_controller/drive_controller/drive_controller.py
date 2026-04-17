@@ -155,6 +155,8 @@ class BasicNavigator(Node):
     def start_callback(self, answer):
         self.start_timer = time.time()
 
+        # self.setInitialPose()
+
         msg = String()
         msg.data = "deploy"
         self.gripper_pub.publish(msg)
@@ -192,18 +194,15 @@ class BasicNavigator(Node):
             # if (time.time() - self.start_timer) >= self.time_until_end and (time.time() - self.start_timer) < 100:
             if (time.time() - self.start_timer) < self.time_until_end:
                 self.get_logger().info(f"Len wayp = {len(self.points)}, current_point = {self.current_point}")  
-                if self.current_point < len(self.points):
+                if self.current_point < len(self.points) and not self.navigation_in_progress:
                     self.go_to_pose( self.set_goal_pose( self.current_point ) )
-                else:
-                    index = len(self.points) - 1 # Base (last point)
-                    self.go_to_pose( self.set_goal_pose( index ) )   
-                    self.get_logger().info(f"The end?")                    
-
+                                  
             else:
                 self.get_logger().info(f"Go to the base. Time = {time.time() - self.start_timer}, Points = {len(self.points)}")    
 
                 index = len(self.points) - 1 # Base (last point)
-                self.go_to_pose( self.set_goal_pose( index ) )                    
+                self.go_to_pose( self.set_goal_pose( index ) )    
+                            
 
     def go_to_pose(self, pose):
         self.navigation_in_progress = True
@@ -248,37 +247,40 @@ class BasicNavigator(Node):
     def get_result_callback(self, future):
         self.get_logger().info("Call_result_callback")
 
-        result = future.result()  # This is NavigateToPose.Result
-
-        if result is None:
+        result = future.result()
+        if not result:
             self.get_logger().error("Navigation result is None")
-            self.navigation_in_progress = False
             return
+            
+        self.status = result.status
+        self.get_logger().debug(f'Navigation finished with status: {self.status}')
+    
+        # Dont check success now 
+        # if self.status == GoalStatus.STATUS_SUCCEEDED:
+        self._on_navigation_success()
 
-        # Check the action status
-        if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info(f"✅ Goal REACHED! Point {self.current_point}")
 
-            msg = String()
-            msg.data = self.gripper1
-            self.gripper_pub.publish(msg)  
+    def _on_navigation_success(self):
+        self.navigation_in_progress = False
 
-            self.gripper_send = True  
+        # Publish to gripper topic
+        msg = String()
+        msg.data = self.gripper1
+        self.gripper_pub.publish(msg)
+        self.gripper_send = True
         
-        elif result.status == GoalStatus.STATUS_CANCELED:
-            self.get_logger().warn("⚠️ Navigation was CANCELED")
-                        
-        elif result.status == GoalStatus.STATUS_ABORTED:
-            self.get_logger().error(f"❌ Navigation ABORTED: {result.result}")
-            # Optional: skip to next point or retry            
-        else:
-            self.get_logger().warn(f"Unknown status: {result.status}")
-                    
-        # self.update_obstacle( self.points[self.current_point]['kz'] ) # закрываем область, куда выгрузили орехи (если не None)
+        # Move to next waypoint
         self.current_point += 1
+        self.get_logger().info(f'Proceeding to point {self.current_point}')
 
         if len(self.points) == self.current_point:
             self.get_logger().info("All goals complite")    
+
+    def _handle_navigation_failure(self):
+        """Handle failed navigation - retry, skip, or stop"""        
+        # self._retry_with_relaxed_tolerance()
+        
+        self.get_logger().info(f'Navigation failed, skipping to point {self.current_point}')
 
     def update_obstacle(self, obstacle_name):
         """
@@ -297,28 +299,15 @@ class BasicNavigator(Node):
             rclpy.spin_until_future_complete(self, future)
         return
 
-    def is_nav_complete(self):
-        if not self.result_future:
-            # task was cancelled or completed
-            return True
-        rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
-        if self.result_future.result():
-            self.status = self.result_future.result().status
-            if self.status != GoalStatus.STATUS_SUCCEEDED:
-                self.debug('Goal with failed with status code: {0}'.format(self.status))
-                return True
-        else:
-            # Timed out, still processing, not complete yet
-            return False
-
-        self.debug('Goal succeeded!')
-        return True
-
     # def isNavComplete(self):
     #     if not self.result_future:
     #         # task was cancelled or completed
     #         return True
-    #     rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
+
+    #     if not self.result_future.done():
+    #         return False
+
+    #     # rclpy.spin_until_future_complete(self, self.result_future, timeout_sec=0.10)
     #     if self.result_future.result():
     #         self.status = self.result_future.result().status
     #         if self.status != GoalStatus.STATUS_SUCCEEDED:
@@ -334,16 +323,16 @@ class BasicNavigator(Node):
     def getFeedback(self):
         return self.feedback
 
-    def getResult(self):
-        if self.status == GoalStatus.STATUS_SUCCEEDED:
-            return NavigationResult.SUCCEEDED
-        elif self.status == GoalStatus.STATUS_ABORTED:
-            return NavigationResult.FAILED
-        elif self.status == GoalStatus.STATUS_CANCELED:
-            return NavigationResult.CANCELED
-        else:
-            print(self.status)
-            return NavigationResult.UNKNOWN
+    # def getResult(self):
+    #     if self.status == GoalStatus.STATUS_SUCCEEDED:
+    #         return NavigationResult.SUCCEEDED
+    #     elif self.status == GoalStatus.STATUS_ABORTED:
+    #         return NavigationResult.FAILED
+    #     elif self.status == GoalStatus.STATUS_CANCELED:
+    #         return NavigationResult.CANCELED
+    #     else:
+    #         print(self.status)
+    #         return NavigationResult.UNKNOWN
 
     def waitUntilNav2Active(self):
         self._waitForNodeToActivate('amcl')
