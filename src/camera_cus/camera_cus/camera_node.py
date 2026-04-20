@@ -87,27 +87,36 @@ class CusCamera(Node):
         dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         self.board = cv2.aruco.Board(objPoints, dictionary, ids)
 
-        self.marker_length = 80 # в будущем заменить на 70 
-        self.object_corners = np.array([
-            [[-self.marker_length//2,  self.marker_length//2, 0]],  # Левый верхний
-            [[ self.marker_length//2,  self.marker_length//2, 0]],  # Правый верхний
-            [[ self.marker_length//2, -self.marker_length//2, 0]],  # Правый нижний
-            [[-self.marker_length//2, -self.marker_length//2, 0]]   # Левый нижний
-        ], dtype=np.float32)
-
         self.camera_matrix = None
         self.is_calibrated = False
         self.last_time = 0
         self.current_time = 0
         self.last_time_w = 0
-        self.get_logger().info('Node started')
 
-        # физические параметры робота
-        self.max_linear_velocity = 0.3     # м / сек
-        self.max_angular_velocity = 0.5    # радиана / сек
-        self.top_marker_height = 435        # мм
-        self.side_marker_height = self.top_marker_height - 50
 
+        # --- всё о маркерах на роботе: ---
+        
+        self.top_marker_length = 70     # было 80 
+        self.top_object_corners = np.array([
+            [[-self.top_marker_length//2,  self.top_marker_length//2, 0]],  # Левый верхний
+            [[ self.top_marker_length//2,  self.top_marker_length//2, 0]],  # Правый верхний
+            [[ self.top_marker_length//2, -self.top_marker_length//2, 0]],  # Правый нижний
+            [[-self.top_marker_length//2, -self.top_marker_length//2, 0]]   # Левый нижний
+        ], dtype=np.float32)
+
+        self.side_marker_length = 60
+        self.side_object_corners = np.array([
+            [[-self.side_marker_length//2,  self.side_marker_length//2, 0]],  # Левый верхний
+            [[ self.side_marker_length//2,  self.side_marker_length//2, 0]],  # Правый верхний
+            [[ self.side_marker_length//2, -self.side_marker_length//2, 0]],  # Правый нижний
+            [[-self.side_marker_length//2, -self.side_marker_length//2, 0]]   # Левый нижний
+        ], dtype=np.float32)
+
+        
+        
+        # расположение маркеров
+        self.top_marker_height = 455        # мм
+        self.side_marker_height = self.top_marker_height - 70
 
         # self.robot_marker = 1                 # синий
         # дописать боковые маркеры для синей команды 
@@ -125,6 +134,12 @@ class CusCamera(Node):
             88: np.array([48, 0, 0]),
         }
 
+        # физические ограничения скорости робота
+        self.max_linear_velocity = 0.3     # м / сек
+        self.max_angular_velocity = 0.5    # радиана / сек
+        
+        self.get_logger().info('Node started')
+
 
 
     def transform(self, coordinates, z=0):  # передаём корды маркера
@@ -140,16 +155,16 @@ class CusCamera(Node):
 
         coordinates = np.array(coordinates, dtype=np.float32)
         coordinates = coordinates.reshape(4, 1, 2)
-        # print(object_corners.shape, corner_coord.shape)
+        # print(top_object_corners.shape, corner_coord.shape)
 
-        retval, rvec, tvec = cv2.solvePnP(self.object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        retval, rvec, tvec = cv2.solvePnP(self.top_object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
         cv2.drawFrameAxes(
             self.image, 
             self.camera_matrix, 
             self.dist_coeffs, 
             rvec, 
             tvec, 
-            self.marker_length/2
+            self.top_marker_length/2
         )
         rotation_matrix, _ = cv2.Rodrigues(rvec)        
         theta = np.arctan2(rotation_matrix[0,0], rotation_matrix[1,0]) # исправить наоборот?
@@ -168,16 +183,16 @@ class CusCamera(Node):
 
         coordinates = np.array(coordinates, dtype=np.float32)
         coordinates = coordinates.reshape(4, 1, 2)
-        # print(object_corners.shape, corner_coord.shape)
+        # print(side_object_corners.shape, corner_coord.shape)
 
-        retval, rvec, tvec = cv2.solvePnP(self.object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        retval, rvec, tvec = cv2.solvePnP(self.side_object_corners, coordinates, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
         cv2.drawFrameAxes(
             self.image, 
             self.camera_matrix, 
             self.dist_coeffs, 
             rvec, 
             tvec, 
-            self.marker_length/2
+            self.side_marker_length/2
         )
         rotation_matrix, _ = cv2.Rodrigues(rvec)        
 

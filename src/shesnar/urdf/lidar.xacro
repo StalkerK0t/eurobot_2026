@@ -45,10 +45,29 @@
         </xacro:inertial_cylinder>
     </link>
 
+
+
+    <!-- ARUCO - МАРКЕРЫ -->
+    <!-- высота верхнего маркера относительно звена лидара // P.S.: до этого было 0.0935 -->
+    <xacro:property name="top_marker_height" value="0.102" />
+    <!-- масштабирование верхнего маркера -->
+    <!-- оригинальный размер маркера в модели - 0.2 м (с белыми краями); реальный на роботе - 0.07 м (без учёта белого края), 0.0933 м (с учётом) -->
+    <!-- (0.07 / 6 * 8) / 0.2 = 0.466666667 -->
+    <xacro:property name="top_marker_scale" value="0.466666667" />
+
+    <!--отступ в горизонтальной плоскости (вперёд/назад/вбок)-->
+    <xacro:property name="side_marker_horizontal_offset" value="0.048" />  
+    <!-- отступ вниз по высоте относительно плоскости верхнего марекра // P.S.: до этого было -0.0415-->
+    <xacro:property name="side_marker_vertical_offset" value="-0.07" />
+    <!-- масштабирование боковых маркеров -->
+    <!-- оригинальный размер маркеров в модели - 0.2 м (с белыми краями); реальные на роботе - 0.06 м (без учёта белого края), 0.08 м (с учётом) -->
+    <!-- (0.06 / 6 * 8) / 0.2 = 0.4 -->
+    <xacro:property name="side_marker_scale" value="0.4" />
+
     <link name="top_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-7.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-7.obj" scale="${top_marker_scale} 0.005 ${top_marker_scale}"/> 
             </geometry>
         </visual>
     </link>
@@ -56,13 +75,13 @@
     <joint name="aruco_joint" type="fixed">
         <parent link="laser_frame"/>
         <child link="top_aruco"/>
-        <origin xyz="0 0 0.0935" rpy="1.571 0 1.57"/>
+        <origin xyz="0 0 ${top_marker_height}" rpy="1.571 0 1.571"/>
     </joint>
 
     <link name="right_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-77.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-77.obj" scale="${side_marker_scale} 0.005 ${side_marker_scale}"/>
             </geometry>
         </visual>
     </link>
@@ -70,13 +89,13 @@
     <joint name="right_aruco_joint" type="fixed">
         <parent link="top_aruco"/>
         <child link="right_aruco"/>
-        <origin xyz="0 -0.0415 0.048" rpy="1.571 0 0"/>
+        <origin xyz="0 ${side_marker_vertical_offset} ${side_marker_horizontal_offset}" rpy="1.571 0 0"/>
     </joint>
 
     <link name="left_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-78.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-78.obj" scale="${side_marker_scale} 0.005 ${side_marker_scale}"/>
             </geometry>
         </visual>
     </link>
@@ -84,13 +103,13 @@
     <joint name="left_aruco_joint" type="fixed">
         <parent link="top_aruco"/>
         <child link="left_aruco"/>
-        <origin xyz="0 -0.0415 -0.048" rpy="-1.571 0 -3.14"/>
+        <origin xyz="0 ${side_marker_vertical_offset} ${-side_marker_horizontal_offset}" rpy="-1.571 0 -3.14"/>
     </joint>
 
     <link name="back_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-83.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-83.obj" scale="${side_marker_scale} 0.005 ${side_marker_scale}"/>
             </geometry>
         </visual>
     </link>
@@ -98,13 +117,13 @@
     <joint name="back_aruco_joint" type="fixed">
         <parent link="top_aruco"/>
         <child link="back_aruco"/>
-        <origin xyz="-0.048 -0.0415 0" rpy="0 -1.571 1.571"/>
+        <origin xyz="${-side_marker_horizontal_offset} ${side_marker_vertical_offset} 0" rpy="0 -1.571 1.571"/>
     </joint>
 
     <link name="forward_aruco">
         <visual>
             <geometry>
-                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-88.obj" scale="0.5 0.5 0.5"/>
+                 <mesh filename="file://$(find shesnar)/meshes/aruco_plane-88.obj" scale="${side_marker_scale} 0.005 ${side_marker_scale}"/>
             </geometry>
         </visual>
     </link>
@@ -112,7 +131,7 @@
     <joint name="forward_aruco_joint" type="fixed">
         <parent link="top_aruco"/>
         <child link="forward_aruco"/>
-        <origin xyz="0.048 -0.0415 0" rpy="0 1.571 -1.571"/>
+        <origin xyz="${side_marker_horizontal_offset} ${side_marker_vertical_offset} 0" rpy="0 1.571 -1.571"/>
     </joint>
 
     

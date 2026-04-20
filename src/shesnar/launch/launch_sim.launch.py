@@ -248,7 +248,7 @@ def generate_launch_description():
         ros_gz_bridge,
         spawn_entity,
         move_control,
-        # start_camera_node,
+        start_camera_node,
 
         *ekf_after_camera,
 
