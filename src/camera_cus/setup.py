@@ -21,6 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'camera_node = camera_cus.camera_node:main',
+            # Добавляем ноду визуализации ошибки
+            'error_analysis = camera_cus.error_analysis_node:main',
         ],
     },
 )
